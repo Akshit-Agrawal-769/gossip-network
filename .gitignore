@@ -1,2 +1,7 @@
-*.zip
+ipfs.exe
 kubo/
+kubo.zip
+node_modules/
+state-*.json
+kubo_v*.zip
+t.txt
