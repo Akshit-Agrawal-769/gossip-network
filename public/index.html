@@ -1,168 +1,260 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Aunty Network 🫖 — P2P Gossip & CID Visualizer</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <header>
-      <div class="brand">
-        <h1>🫖 Aunty Kitty Party</h1>
-        <span class="me" id="me">connecting…</span>
-      </div>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aunty Network</title>
+<style>
+  :root{
+    --paper:#f5eee2; --paper2:#efe5d4; --card:#fffaf1; --ink:#2a1d17; --muted:#7b6a5d;
+    --line:#dccdb6; --maroon:#8a1c2b; --marigold:#e2a03a; --green:#2f6b3a; --red:#b3261e;
+    --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --sans: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;display:flex;flex-direction:column}
 
-      <div class="view-tabs" role="tablist" aria-label="View Mode">
-        <button class="tab active" data-view="split" id="tabSplit">⚡ Split View</button>
-        <button class="tab" data-view="viz" id="tabViz">🕸️ Topology &amp; CID Lab</button>
-        <button class="tab" data-view="chat" id="tabChat">💬 Chat Only</button>
-      </div>
+  /* ---------- header ---------- */
+  header{display:flex;align-items:baseline;gap:16px;padding:18px 28px 14px;border-bottom:2px solid var(--ink);flex-wrap:wrap}
+  header h1{font-family:var(--serif);font-weight:700;font-size:30px;margin:0;letter-spacing:-.5px}
+  header h1 span{color:var(--maroon)}
+  .sub{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:16px}
+  .offline{margin-left:auto;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;
+           border:2px solid var(--green);color:var(--green);padding:4px 10px;border-radius:3px}
 
-      <span class="badge">📵 Internet: NOT REQUIRED</span>
-    </header>
+  /* ---------- layout ---------- */
+  main{flex:1;display:grid;grid-template-columns:300px 1fr;min-height:0}
+  aside{border-right:1px solid var(--line);background:var(--paper2);overflow:auto;padding:18px 20px}
+  aside h2{font-family:var(--serif);font-size:15px;font-weight:700;margin:22px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line);
+           text-transform:uppercase;letter-spacing:1.2px;color:var(--maroon)}
+  aside h2:first-child{margin-top:0}
 
-    <main id="mainLayout" class="view-split">
-      <aside>
-        <h2>Aunties in the Colony</h2>
-        <div id="aunties"></div>
+  .member{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:16px}
+  .member.gone{color:var(--muted)} .member.gone .nm{text-decoration:line-through}
+  .member .state{margin-left:auto;font-size:12px;color:var(--muted)}
+  .member.here .state{color:var(--green);font-weight:600}
+  .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;
+      color:#fff;flex:none;font-family:var(--sans)}
 
-        <h2>Gossip Files <small class="hint">(click to inspect CID)</small></h2>
-        <div id="files">
-          <div class="net">No gossip yet. Kya ho gaya sabko?</div>
-        </div>
+  .file{display:block;text-decoration:none;color:inherit;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .file .fn{font-weight:600;word-break:break-all}
+  .file .meta{font-size:12px;color:var(--muted);margin-top:2px;font-family:ui-monospace,Consolas,monospace}
+  .chip{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:1px 6px;border-radius:2px;margin-left:4px;font-family:var(--sans)}
+  .chip.ok{color:var(--green);border:1px solid var(--green)}
+  .chip.bad{color:#fff;background:var(--red)}
+  .chip.wait{color:var(--muted);border:1px solid var(--line)}
+  .empty{font-style:italic;color:var(--muted);font-family:var(--serif);font-size:15px}
 
-        <h2>Network &amp; Peer Bridge</h2>
-        <div class="net" id="net"></div>
-        <div class="bridge-box">
-          <div class="bridge-row">
-            <input
-              type="text"
-              id="peerAddr"
-              placeholder="/ip4/192.168.../tcp/4001/p2p/..."
-              title="Paste another laptop's IPFS Multiaddr to connect directly"
-            />
-            <button id="connectPeerBtn" class="btn-sm" title="Connect to peer">🔗 Bridge</button>
-          </div>
-          <button id="copyMyAddrBtn" class="btn-link">📋 Copy my IPFS peer address</button>
-          <div id="bridgeStatus" class="bridge-status"></div>
-        </div>
-      </aside>
+  .bridge{display:flex;gap:6px;margin-top:4px}
+  .bridge input{flex:1;min-width:0;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:3px;background:var(--card);font-family:ui-monospace,Consolas,monospace}
+  .hint{font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px}
+  .hint b{color:var(--ink);font-family:ui-monospace,Consolas,monospace;font-weight:600}
 
-      <section id="chatPane">
-        <div id="chat"></div>
-      </section>
+  /* ---------- feed ---------- */
+  #feed{overflow:auto;padding:24px 32px 12px}
+  .msg{display:flex;gap:12px;margin:0 0 16px;max-width:760px;animation:in .25s ease-out}
+  .msg .body{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:10px 14px;min-width:0}
+  .msg .who{font-size:13px;font-weight:700;color:var(--maroon);margin-bottom:3px}
+  .msg .who time{font-weight:400;color:var(--muted);margin-left:6px}
+  .msg .txt{font-size:18px;line-height:1.4}
+  .msg.mine{margin-left:auto;flex-direction:row-reverse}
+  .msg.mine .body{background:#fff3d6;border-color:#ecd39c}
 
-      <section id="vizPane">
-        <!-- Top: Interactive Gossip Topology Graph -->
-        <div class="viz-card topology-card">
-          <div class="viz-header">
-            <div>
-              <h3>🕸️ Live Gossip Mesh &amp; P2P Hops</h3>
-              <p class="viz-sub" id="topoSubtitle">
-                mDNS + IPFS Pubsub (`aunty-gossip`) · Click any Aunty node to inspect pinned replicas
-              </p>
-            </div>
-            <div class="viz-actions">
-              <button class="chip-btn" id="simPulseBtn" title="Send a test gossip wave across the topology">
-                📡 Test Wave
-              </button>
-              <button class="chip-btn" id="simDemoBtn" title="Toggle virtual demo aunties to preview multi-node hops & fake detection">
-                🎭 Demo Nodes: OFF
-              </button>
-            </div>
-          </div>
+  .note{text-align:center;font-family:var(--serif);font-style:italic;color:var(--muted);margin:10px auto 16px;font-size:16px;max-width:700px}
 
-          <div class="canvas-wrap">
-            <canvas id="topoCanvas"></canvas>
-            <div id="nodeInspector" class="node-popover" hidden></div>
-            <div class="topo-legend">
-              <span><i class="lg-dot online"></i> Online Aunty</span>
-              <span><i class="lg-dot offline"></i> Offline (Files Survive!)</span>
-              <span><i class="lg-dot pkt-ok"></i> Verified Gossip</span>
-              <span><i class="lg-dot pkt-fake"></i> Tampered Forward</span>
-            </div>
-          </div>
-        </div>
+  .filecard{margin-top:8px;display:flex;align-items:center;gap:12px;border-top:1px dashed var(--line);padding-top:8px}
+  .filecard .cid{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--muted);word-break:break-all}
+  .dl{margin-left:auto;flex:none;text-decoration:none;font-weight:700;font-size:14px;color:var(--green);border:2px solid var(--green);padding:4px 12px;border-radius:3px}
+  .dl:hover{background:var(--green);color:#fff}
 
-        <!-- Bottom: Real-Time CID Verification Pipeline & Hash Diff Inspector -->
-        <div class="viz-card cid-card">
-          <div class="viz-header">
-            <div>
-              <h3>🔐 Cryptographic CID Verification &amp; Fake Catcher</h3>
-              <p class="viz-sub" id="verifyStatusText">
-                Every file is hashed into an immutable IPFS CIDv1 fingerprint before forwarding.
-              </p>
-            </div>
-            <span class="verdict-pill idle" id="verdictPill">WAITING FOR GOSSIP</span>
-          </div>
+  .fake .body{border:2px solid var(--red);background:#fff5f3;position:relative;padding-right:150px}
+  .fake .txt{color:var(--red);font-weight:600}
+  .stampmini{position:absolute;right:14px;top:50%;transform:translateY(-50%) rotate(-8deg);border:3px solid var(--red);color:var(--red);
+             font-weight:900;letter-spacing:2px;padding:4px 10px;font-size:15px;text-transform:uppercase;font-family:var(--sans)}
+  .cmp{font-family:ui-monospace,Consolas,monospace;font-size:12px;margin-top:8px;line-height:1.6;color:var(--ink)}
+  .cmp span{color:var(--muted)}
 
-          <!-- 4-Step Verification Pipeline -->
-          <div class="pipeline" id="pipelineSteps">
-            <div class="step" data-step="1">
-              <div class="step-num">1</div>
-              <div class="step-body">
-                <strong>SHA-256 Digest</strong>
-                <small id="step1Text">Raw bytes hashed</small>
-              </div>
-            </div>
-            <div class="step-arrow">→</div>
-            <div class="step" data-step="2">
-              <div class="step-num">2</div>
-              <div class="step-body">
-                <strong>IPFS CIDv1</strong>
-                <small id="step2Text">Content fingerprint</small>
-              </div>
-            </div>
-            <div class="step-arrow">→</div>
-            <div class="step" data-step="3">
-              <div class="step-num">3</div>
-              <div class="step-body">
-                <strong>Registry Check</strong>
-                <small id="step3Text">Filename ↔ First CID</small>
-              </div>
-            </div>
-            <div class="step-arrow">→</div>
-            <div class="step" data-step="4">
-              <div class="step-num">4</div>
-              <div class="step-body">
-                <strong>Colony Verdict</strong>
-                <small id="step4Text">Pin or Alert</small>
-              </div>
-            </div>
-          </div>
+  /* ---------- composer ---------- */
+  footer{grid-column:2;display:flex;gap:10px;align-items:center;padding:12px 32px 16px;border-top:1px solid var(--line);background:var(--paper);flex-wrap:wrap}
+  footer input[type=text]{flex:1;min-width:200px;font-size:17px;padding:12px 14px;border:1px solid var(--line);border-radius:3px;background:var(--card);font-family:var(--sans)}
+  footer input[type=text]:focus,.bridge input:focus{outline:2px solid var(--marigold);outline-offset:-1px}
+  button,.btn{font:inherit;font-size:15px;font-weight:700;cursor:pointer;border-radius:3px;padding:11px 16px;border:2px solid var(--ink);background:var(--ink);color:var(--paper)}
+  .btn.ghost,button.ghost{background:transparent;color:var(--ink)}
+  button:hover,.btn:hover{filter:brightness(1.15)}
+  .fakebox{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--red);font-weight:600}
+  .fakebox select{font:inherit;font-size:14px;padding:6px;border:1px solid var(--red);border-radius:3px;background:var(--card)}
+  .rightcol{display:flex;flex-direction:column;min-height:0}
 
-          <!-- Detailed CID & Content Diff Inspector -->
-          <div id="cidInspectorBody" class="cid-inspector-empty">
-            Select any shared file on the left (or share a new file / trigger <b>😈 Fake Aunty mode</b>) to inspect its live SHA-256 digest, CIDv1 fingerprint breakdown, replica holders, and byte-level tamper diff.
-          </div>
-        </div>
-      </section>
-    </main>
+  /* ---------- the big rubber stamp ---------- */
+  #stamp{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:9}
+  #stamp div{font-family:var(--sans);font-weight:900;letter-spacing:6px;font-size:min(14vw,130px);padding:10px 34px;
+             border:10px solid currentColor;border-radius:8px;color:var(--maroon);opacity:0;transform:rotate(-12deg) scale(2.2)}
+  #stamp.go div{animation:thump 1.3s ease-out forwards}
+  #stamp.fakey div{color:var(--red)}
+  @keyframes thump{0%{opacity:0;transform:rotate(-12deg) scale(2.2)}18%{opacity:.92;transform:rotate(-12deg) scale(1)}75%{opacity:.92}100%{opacity:0;transform:rotate(-12deg) scale(1)}}
+  @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
+  @media (max-width:780px){
+    main{grid-template-columns:1fr} aside{display:none} footer{grid-column:1;padding:10px 12px}
+    header{padding:12px 14px} header h1{font-size:22px} .offline{display:none} #feed{padding:16px 12px}
+    .fake .body{padding-right:14px} .stampmini{position:static;display:inline-block;transform:rotate(-6deg);margin-top:8px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Aunty <span>Network</span></h1>
+  <span class="sub" id="me">connecting to the colony…</span>
+  <span class="offline">Internet not required</span>
+</header>
+
+<main>
+  <aside>
+    <h2>Present today</h2>
+    <div id="members"></div>
+
+    <h2>Shared gossip</h2>
+    <div id="files"><div class="empty">Nothing yet. Suspiciously quiet.</div></div>
+
+    <h2>Invite an aunty</h2>
+    <form class="bridge" id="bridgeForm">
+      <input id="bridgeIp" placeholder="her laptop's IP, e.g. 192.168.43.12" autocomplete="off">
+      <button class="ghost" type="submit">Invite</button>
+    </form>
+    <div class="hint" id="bridgeMsg">Only needed if she doesn't show up above on her own.</div>
+
+    <h2>Phones join at</h2>
+    <div class="hint" id="ips"></div>
+  </aside>
+
+  <div class="rightcol">
+    <div id="feed"></div>
     <footer>
-      <input
-        type="text"
-        id="msg"
-        placeholder="Type some gossip, beta…"
-        autocomplete="off"
-      />
-      <button class="send" id="send">Send 📢</button>
-      <label class="btn attach"
-        >📎 Share file<input type="file" id="file" hidden
-      /></label>
-      <span
-        class="fakebox"
-        title="Demo: secretly change a file and forward it under an existing name"
-      >
-        <input type="checkbox" id="fake" /> 😈 Fake Aunty mode
+      <input type="text" id="msg" placeholder="Type some gossip, beta…" autocomplete="off">
+      <button id="send">Send</button>
+      <label class="btn ghost">Share a file<input type="file" id="file" hidden></label>
+      <span class="fakebox" title="Demo: secretly change a file and forward it under an existing name">
+        <input type="checkbox" id="fake"> Fake Aunty
         <select id="fakeAs" hidden></select>
       </span>
     </footer>
+  </div>
+</main>
 
-    <div id="haww">HAWWW!</div>
+<div id="stamp"><div>HAWWW!</div></div>
 
-    <script src="script.js"></script>
-  </body>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const time = (t) => new Date(t).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+const shortCid = (c) => c ? c.slice(0,8) + "…" + c.slice(-6) : "";
+const COLORS = ["#8a1c2b","#2f6b3a","#b8652a","#3c4f8a","#7a4a8c","#1f6f6b","#9a7b1c"];
+const colorOf = (n) => COLORS[[...String(n)].reduce((s,c)=>s+c.charCodeAt(0),0) % COLORS.length];
+const initials = (n) => String(n).split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
+const av = (n) => `<span class="av" style="background:${colorOf(n)}">${esc(initials(n))}</span>`;
+let me = "";
+
+// ---------- sound + rubber stamp ----------
+let ctx;
+document.addEventListener("click", () => { ctx = ctx || new (window.AudioContext||window.webkitAudioContext)(); }, {once:true});
+function thump(fake){
+  try{
+    ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime;
+    o.type = fake ? "square" : "triangle";
+    o.frequency.setValueAtTime(fake ? 220 : 160, t);
+    o.frequency.exponentialRampToValueAtTime(fake ? 90 : 60, t + .25);
+    g.gain.setValueAtTime(.35, t); g.gain.exponentialRampToValueAtTime(.001, t + .3);
+    o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + .3);
+  }catch(e){}
+  const s = $("stamp"); s.firstElementChild.textContent = fake ? "FAKE!" : "HAWWW!";
+  s.className = ""; void s.offsetWidth; s.className = "go" + (fake ? " fakey" : "");
+}
+
+// ---------- feed ----------
+function render(b){
+  const feed = $("feed");
+  let el;
+  if (b.kind === "system") {
+    el = document.createElement("div"); el.className = "note"; el.textContent = b.text;
+  } else {
+    const mine = b.kind === "mine" || b.mine;
+    const from = b.from || me;
+    el = document.createElement("div");
+    el.className = "msg" + (mine ? " mine" : "") + (b.kind === "fake" ? " fake" : "");
+    let html = `<div class="who">${esc(mine ? "You" : from)}<time>${time(b.time)}</time></div><div class="txt">${esc(b.text)}</div>`;
+    if (b.cid && b.kind !== "fake")
+      html += `<div class="filecard"><div><b>${esc(b.file)}</b><div class="cid">fingerprint ${esc(shortCid(b.cid))}</div></div>
+               <a class="dl" href="/file/${b.cid}">Download</a></div>`;
+    if (b.kind === "fake")
+      html += `<div class="cmp"><span>original fingerprint </span>${esc(shortCid(b.original))}<br><span>this forward&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>${esc(shortCid(b.cid))}</div>
+               <div class="stampmini">Fake forward</div>`;
+    el.innerHTML = av(from) + `<div class="body">${html}</div>`;
+  }
+  feed.appendChild(el);
+  feed.scrollTop = feed.scrollHeight;
+}
+
+// ---------- sidebar ----------
+function renderState(s){
+  me = s.me;
+  $("me").textContent = `you are ${s.me} — kitty party register`;
+  $("members").innerHTML =
+    `<div class="member here">${av(s.me)}<span class="nm">${esc(s.me)} (you)</span><span class="state">here</span></div>` +
+    (s.aunties.length ? "" : `<div class="hint">Waiting for other aunties to arrive…</div>`) +
+    s.aunties.map(a=>`<div class="member ${a.online?"here":"gone"}">${av(a.name)}<span class="nm">${esc(a.name)}</span>
+      <span class="state">${a.online?"here":"left"}</span></div>`).join("");
+
+  $("files").innerHTML = s.files.length ? s.files.map(f=>{
+    const chip = f.fake ? `<span class="chip bad">fake</span>`
+               : (f.status==="fetching" ? `<span class="chip wait">fetching</span>` : `<span class="chip ok">verified</span>`);
+    return `<a class="file" href="/file/${f.cid}"><div class="fn">${esc(f.filename)}${chip}</div>
+            <div class="meta">${esc(f.from)} · ${esc(shortCid(f.cid))}</div></a>`;
+  }).join("") : `<div class="empty">Nothing yet. Suspiciously quiet.</div>`;
+
+  $("ips").innerHTML = s.ips.length ? s.ips.map(ip=>`<b>http://${ip}:${s.port}</b>`).join("<br>") : "No network found.";
+  $("fakeAs").innerHTML = Object.keys(s.registry).map(n=>`<option>${esc(n)}</option>`).join("");
+}
+
+// ---------- live updates ----------
+const es = new EventSource("/events");
+es.addEventListener("init", (e) => { const d = JSON.parse(e.data); $("feed").innerHTML = ""; d.feed.forEach(render); renderState(d); });
+es.addEventListener("state", (e) => renderState(JSON.parse(e.data)));
+es.addEventListener("bubble", (e) => {
+  const b = JSON.parse(e.data); render(b);
+  if (b.kind === "file") thump(false);
+  if (b.kind === "fake") thump(true);
+});
+es.onerror = () => { $("me").textContent = "lost the aunty server — reconnecting…"; };
+
+// ---------- actions ----------
+async function sendChat(){
+  const text = $("msg").value.trim(); if (!text) return;
+  $("msg").value = "";
+  await fetch("/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({text})});
+}
+$("send").onclick = sendChat;
+$("msg").addEventListener("keydown", (e) => { if (e.key === "Enter") sendChat(); });
+
+$("fake").onchange = () => { $("fakeAs").hidden = !$("fake").checked; };
+$("file").onchange = async () => {
+  const f = $("file").files[0]; if (!f) return;
+  let url = `/upload?name=${encodeURIComponent(f.name)}`;
+  if ($("fake").checked && $("fakeAs").value) url += `&fakeAs=${encodeURIComponent($("fakeAs").value)}`;
+  const r = await fetch(url, {method:"POST", body: f});
+  if (!r.ok) alert("Upload failed: " + (await r.text()));
+  $("file").value = "";
+};
+
+$("bridgeForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const ip = $("bridgeIp").value.trim(); if (!ip) return;
+  $("bridgeMsg").textContent = "Calling her…";
+  const r = await fetch("/bridge", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ip})});
+  const d = await r.json().catch(()=>({}));
+  $("bridgeMsg").textContent = r.ok ? `Connected to ${d.name}. She'll appear above in a few seconds.` : (d.error || "Couldn't connect.");
+};
+</script>
+</body>
 </html>
-
