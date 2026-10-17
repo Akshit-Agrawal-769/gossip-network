@@ -1,1 +1,1 @@
-# aunty-network
+# gossip-network
