@@ -54,14 +54,14 @@ const LINES = {
     "HAWWW! {from} has {file}! 📢 Forwarding to everyone…",
     "Arre suno suno! {from} just dropped {file}! 👀",
     "Kya baat hai! {from} ke paas {file} hai. Mujhe bhi mil gaya ✅",
-    "Beta, {from} ne {file} bheja hai. Padh lo, exam kal hai! 📚",
+    "Arre! {from} ne {file} bheja hai. Padh lo, exam kal hai! 📚",
   ],
   sentFile: [
     "Main ({me}) ne {file} sabko bata diya. Ab poori colony ko pata chalega 😌",
     "{file} uploaded. Gossip has left the building 🏃‍♀️💨",
   ],
   fake: [
-    "🚨 Yeh forward FAKE hai, beta! {from} ne {file} badal diya hai!",
+    "🚨 Yeh forward FAKE hai! {from} ne {file} badal diya hai!",
     "🚨 HAWWW! {from} is spreading a tampered {file}! Mat bharosa karna!",
   ],
   joined: [
@@ -316,11 +316,11 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // Update Aunty Name from the Colony Gazette landing page
+    // Update Aunty Name from the landing page
     if (url.pathname === "/set-name" && req.method === "POST") {
       const { name } = JSON.parse((await readBody(req, 2000)).toString() || "{}");
       const clean = String(name || "").trim().slice(0, 40);
-      if (!clean) return sendJSON(res, 400, { error: "Name cannot be empty, beta." });
+      if (!clean) return sendJSON(res, 400, { error: "Name cannot be empty." });
       auntyName = clean;
       pushState();
       shout({ type: "hello", from: auntyName, peerId: myPeerId, registry }).catch(() => {});
@@ -409,7 +409,7 @@ const server = http.createServer(async (req, res) => {
       const { ip } = JSON.parse((await readBody(req, 1000)).toString() || "{}");
       const host = String(ip || "").trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
       const [addr, appPort = "3000"] = host.split(":");
-      if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(addr)) return sendJSON(res, 400, { error: "That doesn't look like an IP address, beta." });
+      if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(addr)) return sendJSON(res, 400, { error: "That doesn't look like an IP address." });
       try {
         const who = await (await fetch(`http://${addr}:${appPort}/whoami`, { signal: AbortSignal.timeout(5000) })).json();
         await kubo("swarm/connect", { arg: `/ip4/${addr}/tcp/${who.swarmPort || 4001}/p2p/${who.peerId}` }, { timeoutMs: 15000 });
@@ -433,7 +433,7 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { "Content-Type": MIME[path.extname(file)] || "application/octet-stream" });
       return fs.createReadStream(file).pipe(res);
     }
-    res.writeHead(404); res.end("Not found, beta.");
+    res.writeHead(404); res.end("Not found.");
   } catch (e) {
     console.error(e);
     if (!res.headersSent) sendJSON(res, 500, { error: e.message });

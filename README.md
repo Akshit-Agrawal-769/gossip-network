@@ -13,7 +13,7 @@ Aunty Network lets laptops (and phones) share files and messages with **no inter
 | **IPFS (Kubo)** | Stores files and gives each one a fingerprint (**CID**) made from its *content*. Laptops on the same hotspot find each other automatically (mDNS). |
 | **Pubsub ("gossip protocol")** | Each laptop shouts "I have a new file!" to every other laptop. Gossip protocol is a real computer-science term. |
 | **server.js** | Small Node.js server (no npm packages) that talks to the local IPFS node and serves the web page. |
-| **Fake-forward detection** | Same filename + different fingerprint = content was changed → 🚨 *"Yeh forward FAKE hai, beta!"* |
+| **Fake-forward detection** | Same filename + different fingerprint = content was changed → 🚨 *"Yeh forward FAKE hai!"* |
 | **Presence** | Every aunty says hello every 5 s. Silent for 20 s → *"has left the kitty party… but the gossip survives."* |
 
 ## Run it (Windows)

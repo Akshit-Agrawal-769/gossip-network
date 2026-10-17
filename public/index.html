@@ -20,38 +20,55 @@
   header h1{font-family:var(--serif);font-weight:700;font-size:30px;margin:0;letter-spacing:-.5px;cursor:pointer}
   header h1 span{color:var(--maroon)}
   .sub{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:16px}
-  .nav-btn{margin-left:auto;font-family:var(--serif);font-size:14px;font-weight:700;padding:5px 12px;border:1px solid var(--line);
-           background:var(--card);color:var(--ink);border-radius:3px;cursor:pointer}
+  .nav-btn{margin-left:auto;font-family:var(--sans);font-size:14px;font-weight:700;padding:6px 14px;border:1px solid var(--line);
+           background:var(--card);color:var(--ink);border-radius:6px;cursor:pointer}
   .nav-btn:hover{border-color:var(--maroon);color:var(--maroon)}
 
-  /* ---------- landing page (The Colony Gazette) ---------- */
-  #landing{position:fixed;inset:0;background:var(--paper);z-index:20;overflow-y:auto;padding:28px 20px 48px;display:flex;justify-content:center;align-items:flex-start}
+  /* ---------- website landing page ---------- */
+  #landing{position:fixed;inset:0;background:var(--paper);z-index:20;overflow-y:auto;display:flex;flex-direction:column}
   #landing[hidden]{display:none}
-  .gazette{max-width:880px;width:100%;background:var(--card);border:2px solid var(--ink);box-shadow:6px 6px 0 var(--line);padding:28px 36px 34px}
-  .gazette-top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding-bottom:8px;
-               font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:700;flex-wrap:wrap;gap:8px}
-  .gazette-title{font-family:var(--serif);font-size:clamp(34px,6vw,56px);font-weight:700;text-align:center;margin:18px 0 6px;letter-spacing:-1px;line-height:1.05}
-  .gazette-title span{color:var(--maroon)}
-  .gazette-deck{font-family:var(--serif);font-style:italic;text-align:center;font-size:clamp(17px,2.3vw,21px);color:var(--ink);
-                max-width:680px;margin:0 auto 20px;line-height:1.45}
-  .double-rule{border-top:3px double var(--ink);margin:16px 0 22px}
-  .lead-story{font-size:16.5px;line-height:1.6;color:var(--ink);text-align:center;max-width:720px;margin:0 auto 24px}
-  .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;margin-bottom:26px}
-  .step-col{padding:0 8px;border-right:1px dashed var(--line)}
-  .step-col:last-child{border-right:0}
-  .step-num{font-family:var(--serif);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--maroon);margin-bottom:6px}
-  .step-col h3{font-family:var(--serif);font-size:19px;margin:0 0 6px}
-  .step-col p{font-size:14.5px;color:var(--muted);line-height:1.5;margin:0}
+  .site-nav{max-width:1100px;width:100%;margin:0 auto;padding:20px 28px;display:flex;align-items:center;justify-content:space-between}
+  .site-logo{font-family:var(--serif);font-size:26px;font-weight:700;letter-spacing:-.5px}
+  .site-logo span{color:var(--maroon)}
+  .site-tag{font-size:13.5px;font-weight:600;color:var(--green);background:#e7f2e9;border:1px solid #b8d8be;padding:5px 12px;border-radius:999px}
 
-  .enter-box{background:var(--paper2);border:1px solid var(--line);padding:20px 24px;border-radius:4px;display:flex;flex-direction:column;gap:14px}
-  .enter-box label{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--maroon)}
-  .enter-row{display:flex;gap:10px;flex-wrap:wrap}
-  .enter-row input{flex:1;min-width:210px;font-size:17px;padding:11px 14px;border:1px solid var(--ink);border-radius:3px;background:var(--card);font-family:var(--sans)}
-  .presets{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
-  .preset-chip{font-size:13px;padding:4px 10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;cursor:pointer;font-weight:600}
+  .site-main{max-width:1060px;width:100%;margin:0 auto;padding:16px 28px 56px;display:flex;flex-direction:column;gap:42px}
+
+  /* Hero + Sign-In at Top */
+  .hero-section{display:grid;grid-template-columns:1.15fr 0.85fr;gap:32px;align-items:center;padding-top:10px}
+  .hero-copy h1{font-family:var(--serif);font-size:clamp(34px,4.5vw,50px);line-height:1.1;margin:0 0 14px;letter-spacing:-.8px}
+  .hero-copy h1 span{color:var(--maroon)}
+  .hero-copy .tagline{font-size:18.5px;line-height:1.5;color:var(--ink);margin:0 0 14px;font-weight:500}
+  .hero-copy .desc{font-size:15.5px;line-height:1.6;color:var(--muted);margin:0}
+
+  .signin-card{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:26px 26px 24px;
+               box-shadow:0 10px 28px rgba(42,29,23,.08);display:flex;flex-direction:column;gap:14px}
+  .signin-card h2{font-family:var(--serif);font-size:22px;margin:0;color:var(--ink)}
+  .signin-card p{font-size:14px;color:var(--muted);margin:-6px 0 2px}
+  .signin-field{display:flex;flex-direction:column;gap:8px}
+  .signin-field label{font-size:13.5px;font-weight:700;color:var(--maroon);text-transform:uppercase;letter-spacing:.6px}
+  .signin-field input{width:100%;font-size:16.5px;padding:12px 14px;border:1.5px solid var(--line);border-radius:8px;background:#fff;font-family:var(--sans)}
+  .signin-field input:focus{outline:2px solid var(--maroon);border-color:var(--maroon)}
+  .signin-submit{width:100%;justify-content:center;padding:13px 18px;font-size:16px;border-radius:8px;background:var(--maroon);border-color:var(--maroon);color:#fff}
+  .signin-submit:hover{filter:brightness(1.1)}
+  .presets{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--muted);padding-top:4px}
+  .preset-chip{font-size:12.5px;padding:4px 10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;cursor:pointer;font-weight:600}
   .preset-chip:hover{border-color:var(--maroon);color:var(--maroon)}
 
-  /* ---------- layout ---------- */
+  /* 3 Feature Cards Section */
+  .features-section{display:flex;flex-direction:column;gap:16px}
+  .features-heading{font-family:var(--serif);font-size:22px;margin:0;color:var(--ink)}
+  .cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .feature-card{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:24px;
+                box-shadow:0 4px 14px rgba(42,29,23,.05);display:flex;flex-direction:column;gap:10px;transition:transform .15s ease,box-shadow .15s ease}
+  .feature-card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(42,29,23,.09)}
+  .card-badge{width:40px;height:40px;border-radius:10px;background:var(--paper2);border:1px solid var(--line);
+              display:grid;place-items:center;font-size:20px}
+  .feature-card h3{font-family:var(--serif);font-size:20px;margin:2px 0 0;color:var(--ink)}
+  .feature-card .card-kicker{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--maroon)}
+  .feature-card p{font-size:15px;color:var(--muted);line-height:1.55;margin:0}
+
+  /* ---------- main chat layout ---------- */
   main{flex:1;display:grid;grid-template-columns:310px 1fr;min-height:0}
   aside{border-right:1px solid var(--line);background:var(--paper2);overflow-y:auto;padding:18px 20px}
   aside h2{font-family:var(--serif);font-size:15px;font-weight:700;margin:22px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line);
@@ -133,7 +150,7 @@
   /* ---------- composer ---------- */
   footer{grid-column:2;display:flex;gap:8px;align-items:center;padding:12px 32px 16px;border-top:1px solid var(--line);background:var(--paper);flex-wrap:wrap}
   footer input[type=text]{flex:1;min-width:180px;font-size:17px;padding:11px 14px;border:1px solid var(--line);border-radius:3px;background:var(--card);font-family:var(--sans)}
-  footer input[type=text]:focus,.bridge input:focus,.enter-row input:focus{outline:2px solid var(--marigold);outline-offset:-1px}
+  footer input[type=text]:focus,.bridge input:focus{outline:2px solid var(--marigold);outline-offset:-1px}
   button,.btn{font:inherit;font-size:14.5px;font-weight:700;cursor:pointer;border-radius:3px;padding:10px 14px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);display:inline-flex;align-items:center;gap:6px}
   .btn.ghost,button.ghost{background:transparent;color:var(--ink)}
   button:hover,.btn:hover{filter:brightness(1.12)}
@@ -144,10 +161,10 @@
   /* ---------- camera modal ---------- */
   #camModal{position:fixed;inset:0;background:rgba(42,29,23,.72);z-index:30;display:grid;place-items:center;padding:16px}
   #camModal[hidden]{display:none}
-  .cam-dialog{background:var(--card);border:2px solid var(--ink);box-shadow:6px 6px 0 var(--ink);border-radius:4px;max-width:520px;width:100%;padding:18px 20px}
+  .cam-dialog{background:var(--card);border:2px solid var(--ink);box-shadow:6px 6px 0 var(--ink);border-radius:8px;max-width:520px;width:100%;padding:18px 20px}
   .cam-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}
   .cam-head h3{font-family:var(--serif);margin:0;font-size:20px;color:var(--maroon)}
-  #camVideo{width:100%;max-height:340px;background:#1a120e;border:1px solid var(--line);border-radius:3px;display:block;object-fit:cover}
+  #camVideo{width:100%;max-height:340px;background:#1a120e;border:1px solid var(--line);border-radius:4px;display:block;object-fit:cover}
   .cam-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;flex-wrap:wrap}
 
   /* ---------- the big rubber stamp ---------- */
@@ -160,76 +177,91 @@
   @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.72}}
 
+  @media (max-width:860px){
+    .hero-section{grid-template-columns:1fr}
+    .cards-grid{grid-template-columns:1fr}
+  }
   @media (max-width:780px){
     main{grid-template-columns:1fr} aside{display:none} footer{grid-column:1;padding:10px 12px}
     header{padding:12px 14px} header h1{font-size:22px} #feed{padding:16px 12px}
     .fake .body{padding-right:14px} .stampmini{position:static;display:inline-block;transform:rotate(-6deg);margin-top:8px}
-    .steps-grid{grid-template-columns:1fr} .step-col{border-right:0;border-bottom:1px dashed var(--line);padding:0 0 12px}
-    .gazette{padding:20px 18px}
   }
 </style>
 </head>
 <body>
 
-<!-- ==================== LANDING PAGE: THE COLONY GAZETTE ==================== -->
-<section id="landing" aria-label="Aunty Network Landing Page">
-  <div class="gazette">
-    <div class="gazette-top">
-      <span>Vol. I · Zero-Cloud Edition</span>
-      <span>The Colony Gazette</span>
-      <span>Peer-to-Peer over IPFS</span>
+<!-- ==================== WEBSITE LANDING PAGE ==================== -->
+<section id="landing" aria-label="Aunty Network Home">
+  <nav class="site-nav">
+    <div class="site-logo">Aunty <span>Network</span></div>
+    <span class="site-tag">Offline Peer-to-Peer over IPFS</span>
+  </nav>
+
+  <div class="site-main">
+    <!-- Top Main Section: Hero + Sign-In Card right at the top -->
+    <div class="hero-section">
+      <div class="hero-copy">
+        <h1>Aunty <span>Network</span></h1>
+        <p class="tagline">
+          Indian aunties have run a zero-infrastructure, peer-to-peer information network for centuries. We built the digital version.
+        </p>
+        <p class="desc">
+          Share notes, live voice updates, and photos directly across laptops and phones when the internet is down. Information spreads node-to-node like gossip, and every file is cryptographically verified before it is forwarded.
+        </p>
+      </div>
+
+      <form class="signin-card" id="enterForm">
+        <h2>Sign in to the Kitty Party</h2>
+        <p>Choose your aunty name to join the local network</p>
+        <div class="signin-field">
+          <label for="landingName">Your Name</label>
+          <input id="landingName" type="text" placeholder="e.g. Sharma Aunty" autocomplete="off" required>
+        </div>
+        <button type="submit" class="signin-submit">Enter Kitty Party →</button>
+        <div class="presets">
+          <span>Quick pick:</span>
+          <button type="button" class="preset-chip" data-name="Sharma Aunty">Sharma Aunty</button>
+          <button type="button" class="preset-chip" data-name="Verma Aunty">Verma Aunty</button>
+          <button type="button" class="preset-chip" data-name="Pammi Buaji">Pammi Buaji</button>
+          <button type="button" class="preset-chip" data-name="Gupta Aunty">Gupta Aunty</button>
+        </div>
+      </form>
     </div>
 
-    <h1 class="gazette-title">Aunty <span>Network</span></h1>
-    <p class="gazette-deck">
-      “Indian aunties have run a zero-infrastructure, peer-to-peer information network for centuries. We built the digital version.”
-    </p>
-    <div class="double-rule"></div>
+    <!-- 3 Characteristics as Feature Cards -->
+    <div class="features-section">
+      <h2 class="features-heading">How It Works</h2>
+      <div class="cards-grid">
+        <div class="feature-card">
+          <div class="card-badge">📡</div>
+          <div class="card-kicker">01 · Local Discovery</div>
+          <h3>Zero Internet Needed</h3>
+          <p>Connect laptops and phones to any offline hotspot. Devices discover each other automatically via local mDNS with no router or cloud servers.</p>
+        </div>
 
-    <p class="lead-story">
-      When the Wi-Fi dies the night before an exam—or when there is no router or cloud in sight—<b>Aunty Network</b> bridges the gap between the people who <i>have</i> critical notes, photos, or voice updates and the people who <i>need</i> them. Information hops directly from laptop to laptop like colony gossip, and every file is cryptographically verified before it is forwarded.
-    </p>
+        <div class="feature-card">
+          <div class="card-badge">🫖</div>
+          <div class="card-kicker">02 · Gossip Protocol</div>
+          <h3>The Gossip Survives</h3>
+          <p>Messages, photos, and voice notes replicate peer-to-peer via IPFS Pubsub. Even if the sender closes her laptop, the colony keeps the copy.</p>
+        </div>
 
-    <div class="steps-grid">
-      <div class="step-col">
-        <div class="step-num">I. Local Discovery</div>
-        <h3>Zero Internet Needed</h3>
-        <p>Connect laptops and phones to any offline hotspot. Nodes discover each other automatically via local mDNS—no cloud servers required.</p>
-      </div>
-      <div class="step-col">
-        <div class="step-num">II. Gossip Protocol</div>
-        <h3>The Gossip Survives</h3>
-        <p>Notes, photos, and voice clips spread peer-to-peer via IPFS Pubsub. Even if the original aunty closes her laptop, the colony keeps the copy.</p>
-      </div>
-      <div class="step-col">
-        <div class="step-num">III. Content Fingerprints</div>
-        <h3>Fake Forwards Caught</h3>
-        <p>Every file gets a content fingerprint (CID). If anyone alters a file and re-shares it under the same name, the colony blocks the fake automatically.</p>
+        <div class="feature-card">
+          <div class="card-badge">🛡️</div>
+          <div class="card-kicker">03 · Content Fingerprints</div>
+          <h3>Fake Forwards Caught</h3>
+          <p>Every file gets a cryptographic fingerprint (CID) from its content. Alter a single word in an existing file and the network blocks the fake automatically.</p>
+        </div>
       </div>
     </div>
-
-    <form class="enter-box" id="enterForm">
-      <label for="landingName">Sign the Kitty Party Register — Which aunty are you today?</label>
-      <div class="enter-row">
-        <input id="landingName" type="text" placeholder="e.g. Sharma Aunty" autocomplete="off" required>
-        <button type="submit">Enter the Kitty Party →</button>
-      </div>
-      <div class="presets">
-        <span>Quick pick:</span>
-        <button type="button" class="preset-chip" data-name="Sharma Aunty">Sharma Aunty</button>
-        <button type="button" class="preset-chip" data-name="Verma Aunty">Verma Aunty</button>
-        <button type="button" class="preset-chip" data-name="Pammi Buaji">Pammi Buaji</button>
-        <button type="button" class="preset-chip" data-name="Gupta Aunty">Gupta Aunty</button>
-      </div>
-    </form>
   </div>
 </section>
 
 <!-- ==================== MAIN APPLICATION ==================== -->
 <header>
-  <h1 id="brandTitle" title="Open The Colony Gazette">Aunty <span>Network</span></h1>
+  <h1 id="brandTitle" title="Back to Home">Aunty <span>Network</span></h1>
   <span class="sub" id="me">connecting to the colony…</span>
-  <button type="button" class="nav-btn" id="openGazetteBtn">Colony Gazette</button>
+  <button type="button" class="nav-btn" id="openLandingBtn">Home</button>
 </header>
 
 <main>
@@ -237,7 +269,6 @@
     <h2>Present today</h2>
     <div id="members"></div>
 
-    <!-- Requirement #3: Dropdown menu + scrollable list for Shared Gossip -->
     <details class="gossip-dropdown" open>
       <summary>
         <span>Shared gossip <span class="gossip-count" id="gossipCount">0</span></span>
@@ -273,34 +304,32 @@
   <div class="rightcol">
     <div id="feed"></div>
     <footer>
-      <input type="text" id="msg" placeholder="Type some gossip, beta…" autocomplete="off">
+      <input type="text" id="msg" placeholder="Type some gossip…" autocomplete="off">
       <button type="button" id="send">Send</button>
 
-      <!-- Requirement #2: Direct Microphone & Camera controls -->
-      <button type="button" class="ghost" id="voiceBtn" title="Record and send a voice note">🎙️ Voice</button>
-      <button type="button" class="ghost" id="voiceCancelBtn" class="rec-cancel" hidden title="Cancel recording">Cancel</button>
-      <input type="file" id="voiceFallback" accept="audio/*" capture hidden>
+      <!-- Direct Real-Time Microphone & Camera Capture (never opens file folders) -->
+      <button type="button" class="ghost" id="voiceBtn" title="Record live voice audio from microphone">🎙️ Voice</button>
+      <button type="button" class="ghost rec-cancel" id="voiceCancelBtn" hidden title="Cancel voice recording">Cancel</button>
 
-      <button type="button" class="ghost" id="camBtn" title="Take and share a photo with camera">📷 Camera</button>
-      <input type="file" id="camFallback" accept="image/*" capture="environment" hidden>
+      <button type="button" class="ghost" id="camBtn" title="Capture live photo from camera">📷 Camera</button>
 
-      <label class="btn ghost" title="Share any file or document">📎 Share a file<input type="file" id="file" hidden></label>
+      <label class="btn ghost" title="Share a file from your device">📎 Share a file<input type="file" id="file" hidden></label>
     </footer>
   </div>
 </main>
 
-<!-- ==================== CAMERA CAPTURE MODAL ==================== -->
+<!-- ==================== LIVE CAMERA CAPTURE MODAL ==================== -->
 <div id="camModal" role="dialog" aria-modal="true" aria-labelledby="camTitle" hidden>
   <div class="cam-dialog">
     <div class="cam-head">
-      <h3 id="camTitle">Snap &amp; Share Colony Photo</h3>
+      <h3 id="camTitle">Live Camera Capture</h3>
       <button type="button" class="ghost" id="camCloseBtn" style="padding:4px 10px">✕</button>
     </div>
     <video id="camVideo" autoplay playsinline muted></video>
     <canvas id="camCanvas" hidden></canvas>
     <div class="cam-actions">
-      <button type="button" class="ghost" id="camFlipBtn">Flip Camera</button>
-      <button type="button" id="camSnapBtn">📷 Snap &amp; Share Photo</button>
+      <button type="button" class="ghost" id="camFlipBtn">Switch Camera</button>
+      <button type="button" id="camSnapBtn">📷 Snap &amp; Share to Chat</button>
     </div>
   </div>
 </div>
@@ -323,14 +352,14 @@ const isAudioFile = (fn) => /\.(webm|ogg|mp3|wav|m4a)$/i.test(String(fn || ""));
 let me = "";
 let lastState = null;
 
-// ---------- landing page (The Colony Gazette) ----------
+// ---------- landing page ----------
 if (sessionStorage.getItem("enteredColony") === "1") {
   $("landing").hidden = true;
 }
 document.querySelectorAll(".preset-chip").forEach((btn) => {
   btn.onclick = () => { $("landingName").value = btn.dataset.name; };
 });
-$("openGazetteBtn").onclick = () => {
+$("openLandingBtn").onclick = () => {
   if (me) $("landingName").value = me;
   $("landing").hidden = false;
 };
@@ -481,7 +510,7 @@ $("file").onchange = async () => {
   $("file").value = "";
 };
 
-// ---------- Requirement #2A: Direct Microphone Voice Note Recording ----------
+// ---------- Direct Real-Time Microphone Capture (Never opens file explorer) ----------
 let mediaRecorder = null;
 let audioChunks = [];
 let recTimer = null;
@@ -500,15 +529,15 @@ function resetVoiceUI() {
 }
 
 $("voiceBtn").onclick = async () => {
-  // If currently recording -> stop & send!
+  // If currently recording -> stop & send live recording to chat!
   if (mediaRecorder && mediaRecorder.state === "recording") {
     recCanceled = false;
     mediaRecorder.stop();
     return;
   }
 
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === "undefined") {
-    $("voiceFallback").click();
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert("Microphone access requires opening http://localhost:3000 (or HTTPS) in your browser.");
     return;
   }
 
@@ -516,7 +545,7 @@ $("voiceBtn").onclick = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     audioChunks = [];
     recCanceled = false;
-    const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "";
+    const mimeType = typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "";
     mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
 
     mediaRecorder.ondataavailable = (e) => {
@@ -529,7 +558,7 @@ $("voiceBtn").onclick = async () => {
       const ext = (mediaRecorder.mimeType || "").includes("mp4") ? "m4a" : "webm";
       const stamp = new Date().toTimeString().slice(0, 8).replace(/:/g, "-");
       const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
-      await uploadBlob(blob, `Voice_Gossip_${stamp}.${ext}`);
+      await uploadBlob(blob, `Voice_Note_${stamp}.${ext}`);
     };
 
     mediaRecorder.start();
@@ -544,8 +573,7 @@ $("voiceBtn").onclick = async () => {
       $("voiceBtn").textContent = `● ${m}:${s} · Send Voice`;
     }, 1000);
   } catch (err) {
-    // Fallback to file input if permission denied or insecure HTTP origin on phone
-    $("voiceFallback").click();
+    alert("Could not access microphone (" + err.message + "). Please allow microphone permission in your browser address bar.");
   }
 };
 
@@ -556,31 +584,27 @@ $("voiceCancelBtn").onclick = () => {
   }
 };
 
-$("voiceFallback").onchange = async () => {
-  const f = $("voiceFallback").files[0]; if (!f) return;
-  await uploadBlob(f, f.name);
-  $("voiceFallback").value = "";
-};
-
-// ---------- Requirement #2B: Direct Camera Photo Capture & Share ----------
+// ---------- Direct Real-Time Camera Capture (Never opens file explorer) ----------
 let camStream = null;
-let facingMode = "user";
+let useRearCamera = false;
 
-async function openCamera(mode) {
+async function openCamera() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    $("camFallback").click();
+    alert("Camera access requires opening http://localhost:3000 (or HTTPS) in your browser.");
     return;
   }
   if (camStream) camStream.getTracks().forEach((t) => t.stop());
   try {
-    camStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: mode, width: { ideal: 1280 }, height: { ideal: 720 } },
-      audio: false,
-    });
-    $("camVideo").srcObject = camStream;
+    const constraints = useRearCamera
+      ? { video: { facingMode: { ideal: "environment" } }, audio: false }
+      : { video: true, audio: false };
+    camStream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = $("camVideo");
+    video.srcObject = camStream;
     $("camModal").hidden = false;
-  } catch (e) {
-    $("camFallback").click();
+    await video.play().catch(() => {});
+  } catch (err) {
+    alert("Could not access camera (" + err.message + "). Please allow camera permission in your browser address bar.");
   }
 }
 
@@ -593,11 +617,11 @@ function closeCamera() {
   $("camModal").hidden = true;
 }
 
-$("camBtn").onclick = () => openCamera(facingMode);
+$("camBtn").onclick = () => openCamera();
 $("camCloseBtn").onclick = closeCamera;
 $("camFlipBtn").onclick = () => {
-  facingMode = facingMode === "user" ? "environment" : "user";
-  openCamera(facingMode);
+  useRearCamera = !useRearCamera;
+  openCamera();
 };
 $("camSnapBtn").onclick = () => {
   const video = $("camVideo");
@@ -611,18 +635,12 @@ $("camSnapBtn").onclick = () => {
     closeCamera();
     if (!blob) return;
     const stamp = new Date().toTimeString().slice(0, 8).replace(/:/g, "-");
-    await uploadBlob(blob, `Colony_Photo_${stamp}.jpg`);
-  }, "image/jpeg", 0.88);
+    await uploadBlob(blob, `Photo_${stamp}.jpg`);
+  }, "image/jpeg", 0.9);
 };
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && !$("camModal").hidden) closeCamera();
 });
-
-$("camFallback").onchange = async () => {
-  const f = $("camFallback").files[0]; if (!f) return;
-  await uploadBlob(f, f.name);
-  $("camFallback").value = "";
-};
 
 // ---------- invite bridge ----------
 $("bridgeForm").onsubmit = async (e) => {
@@ -636,4 +654,5 @@ $("bridgeForm").onsubmit = async (e) => {
 </script>
 </body>
 </html>
+
 
