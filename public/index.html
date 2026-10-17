@@ -16,16 +16,44 @@
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;display:flex;flex-direction:column}
 
   /* ---------- header ---------- */
-  header{display:flex;align-items:baseline;gap:16px;padding:18px 28px 14px;border-bottom:2px solid var(--ink);flex-wrap:wrap}
-  header h1{font-family:var(--serif);font-weight:700;font-size:30px;margin:0;letter-spacing:-.5px}
+  header{display:flex;align-items:baseline;gap:16px;padding:16px 28px 13px;border-bottom:2px solid var(--ink);flex-wrap:wrap}
+  header h1{font-family:var(--serif);font-weight:700;font-size:30px;margin:0;letter-spacing:-.5px;cursor:pointer}
   header h1 span{color:var(--maroon)}
   .sub{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:16px}
-  .offline{margin-left:auto;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;
-           border:2px solid var(--green);color:var(--green);padding:4px 10px;border-radius:3px}
+  .nav-btn{margin-left:auto;font-family:var(--serif);font-size:14px;font-weight:700;padding:5px 12px;border:1px solid var(--line);
+           background:var(--card);color:var(--ink);border-radius:3px;cursor:pointer}
+  .nav-btn:hover{border-color:var(--maroon);color:var(--maroon)}
+
+  /* ---------- landing page (The Colony Gazette) ---------- */
+  #landing{position:fixed;inset:0;background:var(--paper);z-index:20;overflow-y:auto;padding:28px 20px 48px;display:flex;justify-content:center;align-items:flex-start}
+  #landing[hidden]{display:none}
+  .gazette{max-width:880px;width:100%;background:var(--card);border:2px solid var(--ink);box-shadow:6px 6px 0 var(--line);padding:28px 36px 34px}
+  .gazette-top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding-bottom:8px;
+               font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:700;flex-wrap:wrap;gap:8px}
+  .gazette-title{font-family:var(--serif);font-size:clamp(34px,6vw,56px);font-weight:700;text-align:center;margin:18px 0 6px;letter-spacing:-1px;line-height:1.05}
+  .gazette-title span{color:var(--maroon)}
+  .gazette-deck{font-family:var(--serif);font-style:italic;text-align:center;font-size:clamp(17px,2.3vw,21px);color:var(--ink);
+                max-width:680px;margin:0 auto 20px;line-height:1.45}
+  .double-rule{border-top:3px double var(--ink);margin:16px 0 22px}
+  .lead-story{font-size:16.5px;line-height:1.6;color:var(--ink);text-align:center;max-width:720px;margin:0 auto 24px}
+  .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;margin-bottom:26px}
+  .step-col{padding:0 8px;border-right:1px dashed var(--line)}
+  .step-col:last-child{border-right:0}
+  .step-num{font-family:var(--serif);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--maroon);margin-bottom:6px}
+  .step-col h3{font-family:var(--serif);font-size:19px;margin:0 0 6px}
+  .step-col p{font-size:14.5px;color:var(--muted);line-height:1.5;margin:0}
+
+  .enter-box{background:var(--paper2);border:1px solid var(--line);padding:20px 24px;border-radius:4px;display:flex;flex-direction:column;gap:14px}
+  .enter-box label{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--maroon)}
+  .enter-row{display:flex;gap:10px;flex-wrap:wrap}
+  .enter-row input{flex:1;min-width:210px;font-size:17px;padding:11px 14px;border:1px solid var(--ink);border-radius:3px;background:var(--card);font-family:var(--sans)}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
+  .preset-chip{font-size:13px;padding:4px 10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;cursor:pointer;font-weight:600}
+  .preset-chip:hover{border-color:var(--maroon);color:var(--maroon)}
 
   /* ---------- layout ---------- */
-  main{flex:1;display:grid;grid-template-columns:300px 1fr;min-height:0}
-  aside{border-right:1px solid var(--line);background:var(--paper2);overflow:auto;padding:18px 20px}
+  main{flex:1;display:grid;grid-template-columns:310px 1fr;min-height:0}
+  aside{border-right:1px solid var(--line);background:var(--paper2);overflow-y:auto;padding:18px 20px}
   aside h2{font-family:var(--serif);font-size:15px;font-weight:700;margin:22px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line);
            text-transform:uppercase;letter-spacing:1.2px;color:var(--maroon)}
   aside h2:first-child{margin-top:0}
@@ -37,14 +65,36 @@
   .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;
       color:#fff;flex:none;font-family:var(--sans)}
 
-  .file{display:block;text-decoration:none;color:inherit;padding:8px 0;border-bottom:1px dashed var(--line)}
-  .file .fn{font-weight:600;word-break:break-all}
-  .file .meta{font-size:12px;color:var(--muted);margin-top:2px;font-family:ui-monospace,Consolas,monospace}
-  .chip{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:1px 6px;border-radius:2px;margin-left:4px;font-family:var(--sans)}
+  /* ---------- shared gossip dropdown & scroll container ---------- */
+  .gossip-dropdown{margin:22px 0 8px;border:1px solid var(--line);border-radius:4px;background:var(--card)}
+  .gossip-dropdown summary{list-style:none;cursor:pointer;padding:9px 12px;font-family:var(--serif);font-size:14.5px;font-weight:700;
+                           text-transform:uppercase;letter-spacing:1.1px;color:var(--maroon);display:flex;align-items:center;justify-content:space-between;
+                           border-bottom:1px solid transparent;user-select:none}
+  .gossip-dropdown summary::-webkit-details-marker{display:none}
+  .gossip-dropdown[open] summary{border-bottom-color:var(--line);background:#f9f1e4}
+  .gossip-dropdown summary .chev{font-size:12px;transition:transform .2s ease;color:var(--muted)}
+  .gossip-dropdown[open] summary .chev{transform:rotate(180deg)}
+  .gossip-count{font-family:var(--sans);font-size:11px;background:var(--maroon);color:#fff;padding:1px 7px;border-radius:999px;margin-left:6px}
+  .gossip-Body{padding:8px 10px 10px}
+  .gossip-filter-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .gossip-filter-row select{width:100%;font:inherit;font-size:13.5px;padding:5px 8px;border:1px solid var(--line);border-radius:3px;
+                            background:var(--paper);color:var(--ink);cursor:pointer}
+  .files-scroll{max-height:220px;overflow-y:auto;padding-right:4px}
+  .files-scroll::-webkit-scrollbar{width:6px}
+  .files-scroll::-webkit-scrollbar-track{background:var(--paper2);border-radius:3px}
+  .files-scroll::-webkit-scrollbar-thumb{background:#c5b299;border-radius:3px}
+  .files-scroll::-webkit-scrollbar-thumb:hover{background:var(--maroon)}
+
+  .file{display:block;text-decoration:none;color:inherit;padding:8px 2px;border-bottom:1px dashed var(--line)}
+  .file:last-child{border-bottom:0}
+  .file.blocked{cursor:not-allowed;opacity:.85}
+  .file .fn{font-weight:600;word-break:break-all;font-size:14.5px}
+  .file .meta{font-size:11.5px;color:var(--muted);margin-top:2px;font-family:ui-monospace,Consolas,monospace}
+  .chip{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:1px 6px;border-radius:2px;margin-left:4px;font-family:var(--sans)}
   .chip.ok{color:var(--green);border:1px solid var(--green)}
   .chip.bad{color:#fff;background:var(--red)}
   .chip.wait{color:var(--muted);border:1px solid var(--line)}
-  .empty{font-style:italic;color:var(--muted);font-family:var(--serif);font-size:15px}
+  .empty{font-style:italic;color:var(--muted);font-family:var(--serif);font-size:14.5px;padding:6px 0}
 
   .bridge{display:flex;gap:6px;margin-top:4px}
   .bridge input{flex:1;min-width:0;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:3px;background:var(--card);font-family:ui-monospace,Consolas,monospace}
@@ -52,7 +102,7 @@
   .hint b{color:var(--ink);font-family:ui-monospace,Consolas,monospace;font-weight:600}
 
   /* ---------- feed ---------- */
-  #feed{overflow:auto;padding:24px 32px 12px}
+  #feed{flex:1;overflow-y:auto;padding:24px 32px 12px}
   .msg{display:flex;gap:12px;margin:0 0 16px;max-width:760px;animation:in .25s ease-out}
   .msg .body{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:10px 14px;min-width:0}
   .msg .who{font-size:13px;font-weight:700;color:var(--maroon);margin-bottom:3px}
@@ -63,50 +113,123 @@
 
   .note{text-align:center;font-family:var(--serif);font-style:italic;color:var(--muted);margin:10px auto 16px;font-size:16px;max-width:700px}
 
+  .media-preview{margin-top:8px}
+  .media-img{display:block;max-width:100%;max-height:280px;border-radius:3px;border:1px solid var(--line);object-fit:contain;background:var(--paper2)}
+  .media-audio{display:block;width:100%;min-width:250px;max-width:360px;height:38px;margin-top:4px}
+
   .filecard{margin-top:8px;display:flex;align-items:center;gap:12px;border-top:1px dashed var(--line);padding-top:8px}
   .filecard .cid{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--muted);word-break:break-all}
   .dl{margin-left:auto;flex:none;text-decoration:none;font-weight:700;font-size:14px;color:var(--green);border:2px solid var(--green);padding:4px 12px;border-radius:3px}
   .dl:hover{background:var(--green);color:#fff}
 
-  .fake .body{border:2px solid var(--red);background:#fff5f3;position:relative;padding-right:150px}
+  .fake .body{border:2px solid var(--red);background:#fff5f3;position:relative;padding-right:155px}
   .fake .txt{color:var(--red);font-weight:600}
   .stampmini{position:absolute;right:14px;top:50%;transform:translateY(-50%) rotate(-8deg);border:3px solid var(--red);color:var(--red);
-             font-weight:900;letter-spacing:2px;padding:4px 10px;font-size:15px;text-transform:uppercase;font-family:var(--sans)}
+             font-weight:900;letter-spacing:2px;padding:4px 10px;font-size:14px;text-transform:uppercase;font-family:var(--sans)}
   .cmp{font-family:ui-monospace,Consolas,monospace;font-size:12px;margin-top:8px;line-height:1.6;color:var(--ink)}
   .cmp span{color:var(--muted)}
+  .orig-link{display:inline-block;margin-top:6px;font-size:13px;font-weight:700;color:var(--green);text-decoration:underline}
 
   /* ---------- composer ---------- */
-  footer{grid-column:2;display:flex;gap:10px;align-items:center;padding:12px 32px 16px;border-top:1px solid var(--line);background:var(--paper);flex-wrap:wrap}
-  footer input[type=text]{flex:1;min-width:200px;font-size:17px;padding:12px 14px;border:1px solid var(--line);border-radius:3px;background:var(--card);font-family:var(--sans)}
-  footer input[type=text]:focus,.bridge input:focus{outline:2px solid var(--marigold);outline-offset:-1px}
-  button,.btn{font:inherit;font-size:15px;font-weight:700;cursor:pointer;border-radius:3px;padding:11px 16px;border:2px solid var(--ink);background:var(--ink);color:var(--paper)}
+  footer{grid-column:2;display:flex;gap:8px;align-items:center;padding:12px 32px 16px;border-top:1px solid var(--line);background:var(--paper);flex-wrap:wrap}
+  footer input[type=text]{flex:1;min-width:180px;font-size:17px;padding:11px 14px;border:1px solid var(--line);border-radius:3px;background:var(--card);font-family:var(--sans)}
+  footer input[type=text]:focus,.bridge input:focus,.enter-row input:focus{outline:2px solid var(--marigold);outline-offset:-1px}
+  button,.btn{font:inherit;font-size:14.5px;font-weight:700;cursor:pointer;border-radius:3px;padding:10px 14px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);display:inline-flex;align-items:center;gap:6px}
   .btn.ghost,button.ghost{background:transparent;color:var(--ink)}
-  button:hover,.btn:hover{filter:brightness(1.15)}
-  .fakebox{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--red);font-weight:600}
-  .fakebox select{font:inherit;font-size:14px;padding:6px;border:1px solid var(--red);border-radius:3px;background:var(--card)}
+  button:hover,.btn:hover{filter:brightness(1.12)}
+  button.recording{background:var(--red);border-color:var(--red);color:#fff;animation:pulse 1s infinite}
+  .rec-cancel{font-size:13px;padding:8px 10px;border-color:var(--muted);color:var(--muted)}
   .rightcol{display:flex;flex-direction:column;min-height:0}
 
+  /* ---------- camera modal ---------- */
+  #camModal{position:fixed;inset:0;background:rgba(42,29,23,.72);z-index:30;display:grid;place-items:center;padding:16px}
+  #camModal[hidden]{display:none}
+  .cam-dialog{background:var(--card);border:2px solid var(--ink);box-shadow:6px 6px 0 var(--ink);border-radius:4px;max-width:520px;width:100%;padding:18px 20px}
+  .cam-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}
+  .cam-head h3{font-family:var(--serif);margin:0;font-size:20px;color:var(--maroon)}
+  #camVideo{width:100%;max-height:340px;background:#1a120e;border:1px solid var(--line);border-radius:3px;display:block;object-fit:cover}
+  .cam-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;flex-wrap:wrap}
+
   /* ---------- the big rubber stamp ---------- */
-  #stamp{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:9}
+  #stamp{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:25}
   #stamp div{font-family:var(--sans);font-weight:900;letter-spacing:6px;font-size:min(14vw,130px);padding:10px 34px;
              border:10px solid currentColor;border-radius:8px;color:var(--maroon);opacity:0;transform:rotate(-12deg) scale(2.2)}
   #stamp.go div{animation:thump 1.3s ease-out forwards}
   #stamp.fakey div{color:var(--red)}
   @keyframes thump{0%{opacity:0;transform:rotate(-12deg) scale(2.2)}18%{opacity:.92;transform:rotate(-12deg) scale(1)}75%{opacity:.92}100%{opacity:0;transform:rotate(-12deg) scale(1)}}
   @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.72}}
 
   @media (max-width:780px){
     main{grid-template-columns:1fr} aside{display:none} footer{grid-column:1;padding:10px 12px}
-    header{padding:12px 14px} header h1{font-size:22px} .offline{display:none} #feed{padding:16px 12px}
+    header{padding:12px 14px} header h1{font-size:22px} #feed{padding:16px 12px}
     .fake .body{padding-right:14px} .stampmini{position:static;display:inline-block;transform:rotate(-6deg);margin-top:8px}
+    .steps-grid{grid-template-columns:1fr} .step-col{border-right:0;border-bottom:1px dashed var(--line);padding:0 0 12px}
+    .gazette{padding:20px 18px}
   }
 </style>
 </head>
 <body>
+
+<!-- ==================== LANDING PAGE: THE COLONY GAZETTE ==================== -->
+<section id="landing" aria-label="Aunty Network Landing Page">
+  <div class="gazette">
+    <div class="gazette-top">
+      <span>Vol. I · Zero-Cloud Edition</span>
+      <span>The Colony Gazette</span>
+      <span>Peer-to-Peer over IPFS</span>
+    </div>
+
+    <h1 class="gazette-title">Aunty <span>Network</span></h1>
+    <p class="gazette-deck">
+      “Indian aunties have run a zero-infrastructure, peer-to-peer information network for centuries. We built the digital version.”
+    </p>
+    <div class="double-rule"></div>
+
+    <p class="lead-story">
+      When the Wi-Fi dies the night before an exam—or when there is no router or cloud in sight—<b>Aunty Network</b> bridges the gap between the people who <i>have</i> critical notes, photos, or voice updates and the people who <i>need</i> them. Information hops directly from laptop to laptop like colony gossip, and every file is cryptographically verified before it is forwarded.
+    </p>
+
+    <div class="steps-grid">
+      <div class="step-col">
+        <div class="step-num">I. Local Discovery</div>
+        <h3>Zero Internet Needed</h3>
+        <p>Connect laptops and phones to any offline hotspot. Nodes discover each other automatically via local mDNS—no cloud servers required.</p>
+      </div>
+      <div class="step-col">
+        <div class="step-num">II. Gossip Protocol</div>
+        <h3>The Gossip Survives</h3>
+        <p>Notes, photos, and voice clips spread peer-to-peer via IPFS Pubsub. Even if the original aunty closes her laptop, the colony keeps the copy.</p>
+      </div>
+      <div class="step-col">
+        <div class="step-num">III. Content Fingerprints</div>
+        <h3>Fake Forwards Caught</h3>
+        <p>Every file gets a content fingerprint (CID). If anyone alters a file and re-shares it under the same name, the colony blocks the fake automatically.</p>
+      </div>
+    </div>
+
+    <form class="enter-box" id="enterForm">
+      <label for="landingName">Sign the Kitty Party Register — Which aunty are you today?</label>
+      <div class="enter-row">
+        <input id="landingName" type="text" placeholder="e.g. Sharma Aunty" autocomplete="off" required>
+        <button type="submit">Enter the Kitty Party →</button>
+      </div>
+      <div class="presets">
+        <span>Quick pick:</span>
+        <button type="button" class="preset-chip" data-name="Sharma Aunty">Sharma Aunty</button>
+        <button type="button" class="preset-chip" data-name="Verma Aunty">Verma Aunty</button>
+        <button type="button" class="preset-chip" data-name="Pammi Buaji">Pammi Buaji</button>
+        <button type="button" class="preset-chip" data-name="Gupta Aunty">Gupta Aunty</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ==================== MAIN APPLICATION ==================== -->
 <header>
-  <h1>Aunty <span>Network</span></h1>
+  <h1 id="brandTitle" title="Open The Colony Gazette">Aunty <span>Network</span></h1>
   <span class="sub" id="me">connecting to the colony…</span>
-  <span class="offline">Internet not required</span>
+  <button type="button" class="nav-btn" id="openGazetteBtn">Colony Gazette</button>
 </header>
 
 <main>
@@ -114,8 +237,27 @@
     <h2>Present today</h2>
     <div id="members"></div>
 
-    <h2>Shared gossip</h2>
-    <div id="files"><div class="empty">Nothing yet. Suspiciously quiet.</div></div>
+    <!-- Requirement #3: Dropdown menu + scrollable list for Shared Gossip -->
+    <details class="gossip-dropdown" open>
+      <summary>
+        <span>Shared gossip <span class="gossip-count" id="gossipCount">0</span></span>
+        <span class="chev">▼</span>
+      </summary>
+      <div class="gossip-Body">
+        <div class="gossip-filter-row">
+          <select id="gossipFilter" aria-label="Filter shared gossip">
+            <option value="all">All shared gossip</option>
+            <option value="verified">Verified only</option>
+            <option value="media">Photos &amp; Voice notes</option>
+            <option value="docs">Documents &amp; Notes</option>
+            <option value="fake">Blocked fakes</option>
+          </select>
+        </div>
+        <div id="files" class="files-scroll">
+          <div class="empty">Nothing yet. Suspiciously quiet.</div>
+        </div>
+      </div>
+    </details>
 
     <h2>Invite an aunty</h2>
     <form class="bridge" id="bridgeForm">
@@ -132,15 +274,36 @@
     <div id="feed"></div>
     <footer>
       <input type="text" id="msg" placeholder="Type some gossip, beta…" autocomplete="off">
-      <button id="send">Send</button>
-      <label class="btn ghost">Share a file<input type="file" id="file" hidden></label>
-      <span class="fakebox" title="Demo: secretly change a file and forward it under an existing name">
-        <input type="checkbox" id="fake"> Fake Aunty
-        <select id="fakeAs" hidden></select>
-      </span>
+      <button type="button" id="send">Send</button>
+
+      <!-- Requirement #2: Direct Microphone & Camera controls -->
+      <button type="button" class="ghost" id="voiceBtn" title="Record and send a voice note">🎙️ Voice</button>
+      <button type="button" class="ghost" id="voiceCancelBtn" class="rec-cancel" hidden title="Cancel recording">Cancel</button>
+      <input type="file" id="voiceFallback" accept="audio/*" capture hidden>
+
+      <button type="button" class="ghost" id="camBtn" title="Take and share a photo with camera">📷 Camera</button>
+      <input type="file" id="camFallback" accept="image/*" capture="environment" hidden>
+
+      <label class="btn ghost" title="Share any file or document">📎 Share a file<input type="file" id="file" hidden></label>
     </footer>
   </div>
 </main>
+
+<!-- ==================== CAMERA CAPTURE MODAL ==================== -->
+<div id="camModal" role="dialog" aria-modal="true" aria-labelledby="camTitle" hidden>
+  <div class="cam-dialog">
+    <div class="cam-head">
+      <h3 id="camTitle">Snap &amp; Share Colony Photo</h3>
+      <button type="button" class="ghost" id="camCloseBtn" style="padding:4px 10px">✕</button>
+    </div>
+    <video id="camVideo" autoplay playsinline muted></video>
+    <canvas id="camCanvas" hidden></canvas>
+    <div class="cam-actions">
+      <button type="button" class="ghost" id="camFlipBtn">Flip Camera</button>
+      <button type="button" id="camSnapBtn">📷 Snap &amp; Share Photo</button>
+    </div>
+  </div>
+</div>
 
 <div id="stamp"><div>HAWWW!</div></div>
 
@@ -153,7 +316,43 @@ const COLORS = ["#8a1c2b","#2f6b3a","#b8652a","#3c4f8a","#7a4a8c","#1f6f6b","#9a
 const colorOf = (n) => COLORS[[...String(n)].reduce((s,c)=>s+c.charCodeAt(0),0) % COLORS.length];
 const initials = (n) => String(n).split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
 const av = (n) => `<span class="av" style="background:${colorOf(n)}">${esc(initials(n))}</span>`;
+
+const isImageFile = (fn) => /\.(jpe?g|png|gif|webp|svg)$/i.test(String(fn || ""));
+const isAudioFile = (fn) => /\.(webm|ogg|mp3|wav|m4a)$/i.test(String(fn || ""));
+
 let me = "";
+let lastState = null;
+
+// ---------- landing page (The Colony Gazette) ----------
+if (sessionStorage.getItem("enteredColony") === "1") {
+  $("landing").hidden = true;
+}
+document.querySelectorAll(".preset-chip").forEach((btn) => {
+  btn.onclick = () => { $("landingName").value = btn.dataset.name; };
+});
+$("openGazetteBtn").onclick = () => {
+  if (me) $("landingName").value = me;
+  $("landing").hidden = false;
+};
+$("brandTitle").onclick = () => {
+  if (me) $("landingName").value = me;
+  $("landing").hidden = false;
+};
+$("enterForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const chosen = $("landingName").value.trim();
+  if (chosen && chosen !== me) {
+    try {
+      await fetch("/set-name", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: chosen }),
+      });
+    } catch (_) {}
+  }
+  sessionStorage.setItem("enteredColony", "1");
+  $("landing").hidden = true;
+};
 
 // ---------- sound + rubber stamp ----------
 let ctx;
@@ -184,12 +383,20 @@ function render(b){
     el = document.createElement("div");
     el.className = "msg" + (mine ? " mine" : "") + (b.kind === "fake" ? " fake" : "");
     let html = `<div class="who">${esc(mine ? "You" : from)}<time>${time(b.time)}</time></div><div class="txt">${esc(b.text)}</div>`;
-    if (b.cid && b.kind !== "fake")
+    if (b.cid && b.kind !== "fake") {
+      if (isImageFile(b.file)) {
+        html += `<div class="media-preview"><img class="media-img" src="/file/${encodeURIComponent(b.cid)}?inline=1" alt="${esc(b.file)}" loading="lazy"></div>`;
+      } else if (isAudioFile(b.file)) {
+        html += `<div class="media-preview"><audio class="media-audio" controls preload="metadata" src="/file/${encodeURIComponent(b.cid)}?inline=1"></audio></div>`;
+      }
       html += `<div class="filecard"><div><b>${esc(b.file)}</b><div class="cid">fingerprint ${esc(shortCid(b.cid))}</div></div>
-               <a class="dl" href="/file/${b.cid}">Download</a></div>`;
-    if (b.kind === "fake")
-      html += `<div class="cmp"><span>original fingerprint </span>${esc(shortCid(b.original))}<br><span>this forward&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>${esc(shortCid(b.cid))}</div>
+               <a class="dl" href="/file/${encodeURIComponent(b.cid)}">Download</a></div>`;
+    }
+    if (b.kind === "fake") {
+      html += `<div class="cmp"><span>original fingerprint </span>${esc(shortCid(b.original))}<br><span>this forward&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>${esc(shortCid(b.cid))} (quarantined)</div>
+               ${b.original ? `<a class="orig-link" href="/file/${encodeURIComponent(b.original)}">Download verified original (${esc(b.file)})</a>` : ""}
                <div class="stampmini">Fake forward</div>`;
+    }
     el.innerHTML = av(from) + `<div class="body">${html}</div>`;
   }
   feed.appendChild(el);
@@ -197,8 +404,39 @@ function render(b){
 }
 
 // ---------- sidebar ----------
+function renderFilesList(files) {
+  const filter = $("gossipFilter").value;
+  $("gossipCount").textContent = files.length;
+
+  const filtered = files.filter((f) => {
+    if (filter === "verified") return !f.fake && f.status !== "fetching";
+    if (filter === "media") return !f.fake && (isImageFile(f.filename) || isAudioFile(f.filename));
+    if (filter === "docs") return !f.fake && !isImageFile(f.filename) && !isAudioFile(f.filename);
+    if (filter === "fake") return !!f.fake;
+    return true;
+  });
+
+  $("files").innerHTML = filtered.length ? filtered.map(f => {
+    const chip = f.fake ? `<span class="chip bad">fake · blocked</span>`
+               : (f.status === "fetching" ? `<span class="chip wait">fetching</span>` : `<span class="chip ok">verified</span>`);
+    const icon = isImageFile(f.filename) ? "📷 " : (isAudioFile(f.filename) ? "🎙️ " : "");
+    if (f.fake) {
+      return `<div class="file blocked" title="Quarantined: fingerprint does not match original"><div class="fn">${icon}${esc(f.filename)}${chip}</div>
+              <div class="meta">${esc(f.from)} · ${esc(shortCid(f.cid))}</div></div>`;
+    }
+    return `<a class="file" href="/file/${encodeURIComponent(f.cid)}"><div class="fn">${icon}${esc(f.filename)}${chip}</div>
+            <div class="meta">${esc(f.from)} · ${esc(shortCid(f.cid))}</div></a>`;
+  }).join("") : `<div class="empty">Nothing in this category yet.</div>`;
+}
+
+$("gossipFilter").onchange = () => {
+  if (lastState) renderFilesList(lastState.files || []);
+};
+
 function renderState(s){
+  lastState = s;
   me = s.me;
+  if (!$("landingName").value) $("landingName").value = s.me;
   $("me").textContent = `you are ${s.me} — kitty party register`;
   $("members").innerHTML =
     `<div class="member here">${av(s.me)}<span class="nm">${esc(s.me)} (you)</span><span class="state">here</span></div>` +
@@ -206,15 +444,9 @@ function renderState(s){
     s.aunties.map(a=>`<div class="member ${a.online?"here":"gone"}">${av(a.name)}<span class="nm">${esc(a.name)}</span>
       <span class="state">${a.online?"here":"left"}</span></div>`).join("");
 
-  $("files").innerHTML = s.files.length ? s.files.map(f=>{
-    const chip = f.fake ? `<span class="chip bad">fake</span>`
-               : (f.status==="fetching" ? `<span class="chip wait">fetching</span>` : `<span class="chip ok">verified</span>`);
-    return `<a class="file" href="/file/${f.cid}"><div class="fn">${esc(f.filename)}${chip}</div>
-            <div class="meta">${esc(f.from)} · ${esc(shortCid(f.cid))}</div></a>`;
-  }).join("") : `<div class="empty">Nothing yet. Suspiciously quiet.</div>`;
+  renderFilesList(s.files || []);
 
   $("ips").innerHTML = s.ips.length ? s.ips.map(ip=>`<b>http://${ip}:${s.port}</b>`).join("<br>") : "No network found.";
-  $("fakeAs").innerHTML = Object.keys(s.registry).map(n=>`<option>${esc(n)}</option>`).join("");
 }
 
 // ---------- live updates ----------
@@ -228,7 +460,13 @@ es.addEventListener("bubble", (e) => {
 });
 es.onerror = () => { $("me").textContent = "lost the aunty server — reconnecting…"; };
 
-// ---------- actions ----------
+// ---------- file upload helper ----------
+async function uploadBlob(blob, filename) {
+  const r = await fetch(`/upload?name=${encodeURIComponent(filename)}`, { method: "POST", body: blob });
+  if (!r.ok) alert("Upload failed: " + (await r.text()));
+}
+
+// ---------- chat & standard file share ----------
 async function sendChat(){
   const text = $("msg").value.trim(); if (!text) return;
   $("msg").value = "";
@@ -237,16 +475,156 @@ async function sendChat(){
 $("send").onclick = sendChat;
 $("msg").addEventListener("keydown", (e) => { if (e.key === "Enter") sendChat(); });
 
-$("fake").onchange = () => { $("fakeAs").hidden = !$("fake").checked; };
 $("file").onchange = async () => {
   const f = $("file").files[0]; if (!f) return;
-  let url = `/upload?name=${encodeURIComponent(f.name)}`;
-  if ($("fake").checked && $("fakeAs").value) url += `&fakeAs=${encodeURIComponent($("fakeAs").value)}`;
-  const r = await fetch(url, {method:"POST", body: f});
-  if (!r.ok) alert("Upload failed: " + (await r.text()));
+  await uploadBlob(f, f.name);
   $("file").value = "";
 };
 
+// ---------- Requirement #2A: Direct Microphone Voice Note Recording ----------
+let mediaRecorder = null;
+let audioChunks = [];
+let recTimer = null;
+let recSeconds = 0;
+let recCanceled = false;
+
+function stopVoiceStream(stream) {
+  if (stream) stream.getTracks().forEach((t) => t.stop());
+}
+
+function resetVoiceUI() {
+  clearInterval(recTimer);
+  $("voiceBtn").classList.remove("recording");
+  $("voiceBtn").textContent = "🎙️ Voice";
+  $("voiceCancelBtn").hidden = true;
+}
+
+$("voiceBtn").onclick = async () => {
+  // If currently recording -> stop & send!
+  if (mediaRecorder && mediaRecorder.state === "recording") {
+    recCanceled = false;
+    mediaRecorder.stop();
+    return;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === "undefined") {
+    $("voiceFallback").click();
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioChunks = [];
+    recCanceled = false;
+    const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "";
+    mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) audioChunks.push(e.data);
+    };
+    mediaRecorder.onstop = async () => {
+      stopVoiceStream(stream);
+      resetVoiceUI();
+      if (recCanceled || !audioChunks.length) return;
+      const ext = (mediaRecorder.mimeType || "").includes("mp4") ? "m4a" : "webm";
+      const stamp = new Date().toTimeString().slice(0, 8).replace(/:/g, "-");
+      const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
+      await uploadBlob(blob, `Voice_Gossip_${stamp}.${ext}`);
+    };
+
+    mediaRecorder.start();
+    recSeconds = 0;
+    $("voiceBtn").classList.add("recording");
+    $("voiceBtn").textContent = "● 0:00 · Send Voice";
+    $("voiceCancelBtn").hidden = false;
+    recTimer = setInterval(() => {
+      recSeconds++;
+      const m = Math.floor(recSeconds / 60);
+      const s = String(recSeconds % 60).padStart(2, "0");
+      $("voiceBtn").textContent = `● ${m}:${s} · Send Voice`;
+    }, 1000);
+  } catch (err) {
+    // Fallback to file input if permission denied or insecure HTTP origin on phone
+    $("voiceFallback").click();
+  }
+};
+
+$("voiceCancelBtn").onclick = () => {
+  if (mediaRecorder && mediaRecorder.state === "recording") {
+    recCanceled = true;
+    mediaRecorder.stop();
+  }
+};
+
+$("voiceFallback").onchange = async () => {
+  const f = $("voiceFallback").files[0]; if (!f) return;
+  await uploadBlob(f, f.name);
+  $("voiceFallback").value = "";
+};
+
+// ---------- Requirement #2B: Direct Camera Photo Capture & Share ----------
+let camStream = null;
+let facingMode = "user";
+
+async function openCamera(mode) {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    $("camFallback").click();
+    return;
+  }
+  if (camStream) camStream.getTracks().forEach((t) => t.stop());
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: mode, width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false,
+    });
+    $("camVideo").srcObject = camStream;
+    $("camModal").hidden = false;
+  } catch (e) {
+    $("camFallback").click();
+  }
+}
+
+function closeCamera() {
+  if (camStream) {
+    camStream.getTracks().forEach((t) => t.stop());
+    camStream = null;
+  }
+  $("camVideo").srcObject = null;
+  $("camModal").hidden = true;
+}
+
+$("camBtn").onclick = () => openCamera(facingMode);
+$("camCloseBtn").onclick = closeCamera;
+$("camFlipBtn").onclick = () => {
+  facingMode = facingMode === "user" ? "environment" : "user";
+  openCamera(facingMode);
+};
+$("camSnapBtn").onclick = () => {
+  const video = $("camVideo");
+  const canvas = $("camCanvas");
+  const w = video.videoWidth || 640;
+  const h = video.videoHeight || 480;
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+  canvas.toBlob(async (blob) => {
+    closeCamera();
+    if (!blob) return;
+    const stamp = new Date().toTimeString().slice(0, 8).replace(/:/g, "-");
+    await uploadBlob(blob, `Colony_Photo_${stamp}.jpg`);
+  }, "image/jpeg", 0.88);
+};
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !$("camModal").hidden) closeCamera();
+});
+
+$("camFallback").onchange = async () => {
+  const f = $("camFallback").files[0]; if (!f) return;
+  await uploadBlob(f, f.name);
+  $("camFallback").value = "";
+};
+
+// ---------- invite bridge ----------
 $("bridgeForm").onsubmit = async (e) => {
   e.preventDefault();
   const ip = $("bridgeIp").value.trim(); if (!ip) return;
@@ -258,3 +636,4 @@ $("bridgeForm").onsubmit = async (e) => {
 </script>
 </body>
 </html>
+

@@ -16,19 +16,19 @@ const path = require("path");
 const os = require("os");
 
 // ---------- Settings (change with environment variables) -------------
-const AUNTY_NAME = process.env.AUNTY_NAME || "Sharma Aunty";
+let auntyName = process.env.AUNTY_NAME || "Sharma Aunty";
 const PORT = Number(process.env.PORT || 3000);
 const KUBO = process.env.KUBO_API || "http://127.0.0.1:5001/api/v0";
 const TOPIC = "aunty-gossip";
 const HELLO_EVERY_MS = 5000;   // "I'm still here" shout
 const GONE_AFTER_MS = 20000;   // silent this long = left the kitty party
-const STATE_FILE = path.join(__dirname, `state-${AUNTY_NAME.replace(/\W+/g, "_")}.json`);
+const STATE_FILE = path.join(__dirname, `state-${auntyName.replace(/\W+/g, "_")}.json`);
 
 // ---------- Memory of this aunty --------------------------------------
 let myPeerId = null;
 let mySwarmPort = 4001;
 const feed = [];           // chat bubbles shown in the UI
-const files = {};          // cid -> { cid, filename, from, time, status, fake }
+const files = {};          // cid -> { cid, filename, from, time, status, fake, original }
 const registry = {};       // filename -> first cid ever seen (to catch fakes)
 const aunties = {};        // name -> { name, peerId, lastSeen, online }
 const browsers = new Set();// open web pages (Server-Sent Events)
@@ -120,7 +120,7 @@ function pushState() {
 }
 function snapshot() {
   return {
-    me: AUNTY_NAME,
+    me: auntyName,
     peerId: myPeerId,
     ips: lanIPs(),
     port: PORT,
@@ -146,6 +146,17 @@ async function onMessage(msg) {
   if (msg.type === "hello") {
     const known = aunties[msg.from];
     aunties[msg.from] = { name: msg.from, peerId: msg.peerId, lastSeen: Date.now(), online: true };
+    // Sync canonical registry so late-joining laptops also catch tampered files
+    if (msg.registry && typeof msg.registry === "object") {
+      let updated = false;
+      for (const [fn, origCid] of Object.entries(msg.registry)) {
+        if (!registry[fn] && typeof origCid === "string") {
+          registry[fn] = origCid;
+          updated = true;
+        }
+      }
+      if (updated) save();
+    }
     if (!known) addBubble({ kind: "system", text: fill(pick(LINES.joined), { name: msg.from }) });
     else if (!known.online) addBubble({ kind: "system", text: fill(pick(LINES.back), { name: msg.from }) });
     pushState();
@@ -162,7 +173,24 @@ async function onMessage(msg) {
     if (files[cid]) return; // already have it
 
     const original = checkFake(filename, cid);
-    files[cid] = { cid, filename, from, time: Date.now(), status: "fetching", fake: !!original, original };
+
+    // If this filename already exists with a different CID, quarantine/block the fake forward!
+    if (original) {
+      files[cid] = { cid, filename, from, time: Date.now(), status: "blocked", fake: true, original };
+      save();
+      pushState();
+      addBubble({
+        kind: "fake",
+        from,
+        file: filename,
+        cid,
+        original,
+        text: fill(pick(LINES.fake), { from, file: filename }),
+      });
+      return;
+    }
+
+    files[cid] = { cid, filename, from, time: Date.now(), status: "fetching", fake: false, original: null };
     pushState();
     addBubble({ kind: "system", text: fill(pick(LINES.pending), { from, file: filename }) });
 
@@ -172,17 +200,20 @@ async function onMessage(msg) {
       files[cid].status = "received";
     } catch (e) {
       files[cid].status = "failed";
+      if (registry[filename] === cid) delete registry[filename];
       console.error("fetch failed", cid, e.message);
     }
     save();
     pushState();
 
-    if (original) {
-      addBubble({ kind: "fake", from, file: filename, cid, original,
-        text: fill(pick(LINES.fake), { from, file: filename }) });
-    } else if (files[cid].status === "received") {
-      addBubble({ kind: "file", from, file: filename, cid,
-        text: fill(pick(LINES.newFile), { from, file: filename }) });
+    if (files[cid].status === "received") {
+      addBubble({
+        kind: "file",
+        from,
+        file: filename,
+        cid,
+        text: fill(pick(LINES.newFile), { from, file: filename }),
+      });
     }
   }
 }
@@ -220,7 +251,7 @@ async function listen() {
 // Every few seconds: say hello, and notice aunties who went quiet
 function startPresence() {
   setInterval(async () => {
-    try { await shout({ type: "hello", from: AUNTY_NAME, peerId: myPeerId }); }
+    try { await shout({ type: "hello", from: auntyName, peerId: myPeerId, registry }); }
     catch (e) { console.error("hello failed:", e.message); }
 
     for (const a of Object.values(aunties)) {
@@ -251,7 +282,25 @@ function sendJSON(res, code, obj) {
   res.writeHead(code, { "Content-Type": "application/json" });
   res.end(JSON.stringify(obj));
 }
-const MIME = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png" };
+const MIME = {
+  ".html": "text/html; charset=utf-8",
+  ".css": "text/css",
+  ".js": "text/javascript",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".webm": "audio/webm",
+  ".ogg": "audio/ogg",
+  ".mp3": "audio/mpeg",
+  ".wav": "audio/wav",
+  ".m4a": "audio/mp4",
+  ".mp4": "video/mp4",
+  ".pdf": "application/pdf",
+  ".txt": "text/plain; charset=utf-8",
+};
 
 // ---------- The web server --------------------------------------------
 const server = http.createServer(async (req, res) => {
@@ -267,11 +316,20 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    // Update Aunty Name from the Colony Gazette landing page
+    if (url.pathname === "/set-name" && req.method === "POST") {
+      const { name } = JSON.parse((await readBody(req, 2000)).toString() || "{}");
+      const clean = String(name || "").trim().slice(0, 40);
+      if (!clean) return sendJSON(res, 400, { error: "Name cannot be empty, beta." });
+      auntyName = clean;
+      pushState();
+      shout({ type: "hello", from: auntyName, peerId: myPeerId, registry }).catch(() => {});
+      return sendJSON(res, 200, { ok: true, me: auntyName });
+    }
+
     // Upload a file -> add to IPFS -> shout the gossip
     if (url.pathname === "/upload" && req.method === "POST") {
-      const original = decodeURIComponent(url.searchParams.get("name") || "file");
-      const fakeAs = url.searchParams.get("fakeAs"); // Fake Aunty mode: pretend to be an existing file
-      const filename = fakeAs || original;
+      const filename = decodeURIComponent(url.searchParams.get("name") || "file");
       const data = await readBody(req);
       const form = new FormData();
       form.append("file", new Blob([data]), filename);
@@ -279,33 +337,62 @@ const server = http.createServer(async (req, res) => {
       const cid = added.Hash;
 
       const originalCid = checkFake(filename, cid);
-      files[cid] = { cid, filename, from: AUNTY_NAME, time: Date.now(), status: "mine", fake: !!originalCid, original: originalCid };
-      await shout({ type: "gossip", cid, filename, from: AUNTY_NAME, peerId: myPeerId });
+      files[cid] = {
+        cid,
+        filename,
+        from: auntyName,
+        time: Date.now(),
+        status: originalCid ? "blocked" : "mine",
+        fake: !!originalCid,
+        original: originalCid,
+      };
+      await shout({ type: "gossip", cid, filename, from: auntyName, peerId: myPeerId });
 
-      addBubble({ kind: "mine", from: AUNTY_NAME, file: filename, cid,
-        text: fakeAs ? `😈 (Fake Aunty mode) I secretly changed ${filename} and forwarded it…`
-                     : fill(pick(LINES.sentFile), { me: AUNTY_NAME, file: filename }) });
+      if (originalCid) {
+        addBubble({
+          kind: "fake",
+          mine: true,
+          from: auntyName,
+          file: filename,
+          cid,
+          original: originalCid,
+          text: fill(pick(LINES.fake), { from: auntyName, file: filename }),
+        });
+      } else {
+        addBubble({
+          kind: "mine",
+          from: auntyName,
+          file: filename,
+          cid,
+          text: fill(pick(LINES.sentFile), { me: auntyName, file: filename }),
+        });
+      }
       pushState();
-      return sendJSON(res, 200, { cid, filename });
+      return sendJSON(res, 200, { cid, filename, fake: !!originalCid, original: originalCid });
     }
 
     // Send a text gossip
     if (url.pathname === "/chat" && req.method === "POST") {
       const { text } = JSON.parse((await readBody(req, 10000)).toString() || "{}");
       if (!text || !text.trim()) return sendJSON(res, 400, { error: "empty" });
-      await shout({ type: "chat", from: AUNTY_NAME, peerId: myPeerId, text: text.trim() });
-      addBubble({ kind: "chat", from: AUNTY_NAME, text: text.trim(), mine: true });
+      await shout({ type: "chat", from: auntyName, peerId: myPeerId, text: text.trim() });
+      addBubble({ kind: "chat", from: auntyName, text: text.trim(), mine: true });
       return sendJSON(res, 200, { ok: true });
     }
 
-    // Download a file from IPFS
+    // Download or inline-stream a file from IPFS
     if (url.pathname.startsWith("/file/")) {
       const cid = url.pathname.slice(6);
       const meta = files[cid];
+      const fname = meta?.filename || cid;
+      const ext = path.extname(fname).toLowerCase();
+      const isInline = url.searchParams.get("inline") === "1";
+      const contentType = MIME[ext] || "application/octet-stream";
+      const disposition = isInline ? "inline" : "attachment";
       const r = await kubo("cat", { arg: cid }, { raw: true, timeoutMs: 60000 });
       res.writeHead(200, {
-        "Content-Type": "application/octet-stream",
-        "Content-Disposition": `attachment; filename="${encodeURIComponent(meta?.filename || cid)}"`,
+        "Content-Type": contentType,
+        "Content-Disposition": `${disposition}; filename="${encodeURIComponent(fname)}"`,
       });
       for await (const chunk of r.body) res.write(chunk);
       return res.end();
@@ -313,7 +400,7 @@ const server = http.createServer(async (req, res) => {
 
     // Who am I? (another laptop asks this before connecting to us)
     if (url.pathname === "/whoami") {
-      return sendJSON(res, 200, { name: AUNTY_NAME, peerId: myPeerId, swarmPort: mySwarmPort });
+      return sendJSON(res, 200, { name: auntyName, peerId: myPeerId, swarmPort: mySwarmPort });
     }
 
     // Bridge: connect our IPFS node straight to another laptop, just from its IP.
@@ -360,7 +447,7 @@ const server = http.createServer(async (req, res) => {
     const id = await kubo("id");
     myPeerId = id.ID;
     // Which TCP port does our IPFS node listen on? (usually 4001)
-    const tcp = (id.Addresses || []).map((a) => a.match(/\/tcp\/(\d+)\//)).find(Boolean);
+    const tcp = (id.Addresses || []).map((a) => a.match(/\/tcp\/(\d+)(\/|$)/)).find(Boolean);
     if (tcp) mySwarmPort = Number(tcp[1]);
   } catch (e) {
     console.error("\n❌ Cannot reach the IPFS daemon at", KUBO);
@@ -368,7 +455,7 @@ const server = http.createServer(async (req, res) => {
     process.exit(1);
   }
   server.listen(PORT, "0.0.0.0", () => {
-    console.log(`\n🫖 ${AUNTY_NAME} is ready to gossip!`);
+    console.log(`\n🫖 ${auntyName} is ready to gossip!`);
     console.log(`   IPFS peer id: ${myPeerId}`);
     console.log(`   Open on this laptop:  http://localhost:${PORT}`);
     for (const ip of lanIPs()) console.log(`   Open on phones:       http://${ip}:${PORT}`);
@@ -377,3 +464,4 @@ const server = http.createServer(async (req, res) => {
   listen();
   startPresence();
 })();
+
