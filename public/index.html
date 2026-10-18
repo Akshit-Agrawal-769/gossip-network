@@ -3,656 +3,467 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Aunty Network</title>
+<title>Relay</title>
 <style>
+  /* Offline-first: system fonts only, no external requests. */
   :root{
-    --paper:#f5eee2; --paper2:#efe5d4; --card:#fffaf1; --ink:#2a1d17; --muted:#7b6a5d;
-    --line:#dccdb6; --maroon:#8a1c2b; --marigold:#e2a03a; --green:#2f6b3a; --red:#b3261e;
-    --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
-    --sans: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    --bg:#e9edf1; --panel:#f7f9fb; --surface:#ffffff; --ink:#18212b; --muted:#5a6573; --line:#d2d9e1;
+    --navy:#1d3a6e; --ok:#0b7a5f; --wait:#9a6200; --bad:#b42318; --bad-bg:#fdf0ee;
+    --sans:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Roboto,sans-serif;
+    --mono:"Cascadia Mono",ui-monospace,Consolas,"SF Mono",Menlo,monospace;
   }
   *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  a.btn{text-decoration:none}
   html,body{height:100%}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;display:flex;flex-direction:column}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);display:flex;flex-direction:column}
+  button,input,select{font:inherit;color:inherit}
+  :focus-visible{outline:2px solid var(--navy);outline-offset:2px}
 
-  /* ---------- header ---------- */
-  header{display:flex;align-items:baseline;gap:16px;padding:16px 28px 13px;border-bottom:2px solid var(--ink);flex-wrap:wrap}
-  header h1{font-family:var(--serif);font-weight:700;font-size:30px;margin:0;letter-spacing:-.5px;cursor:pointer}
-  header h1 span{color:var(--maroon)}
-  .sub{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:16px}
-  .nav-btn{margin-left:auto;font-family:var(--sans);font-size:14px;font-weight:700;padding:6px 14px;border:1px solid var(--line);
-           background:var(--card);color:var(--ink);border-radius:6px;cursor:pointer}
-  .nav-btn:hover{border-color:var(--maroon);color:var(--maroon)}
+  /* ---------- top bar ---------- */
+  .top{display:flex;align-items:center;gap:14px;padding:10px 20px;background:var(--navy);color:#fff}
+  .top h1{margin:0;font-size:17px;font-weight:650;letter-spacing:.2px}
+  .net{display:flex;align-items:center;gap:8px;font-size:13.5px;opacity:.92}
+  .dot{width:8px;height:8px;border-radius:50%;background:#9aa6b4;flex:none}
+  .dot.on{background:#36c28e}
+  .top .net{margin-left:auto}
 
-  /* ---------- website landing page ---------- */
-  #landing{position:fixed;inset:0;background:var(--paper);z-index:20;overflow-y:auto;display:flex;flex-direction:column}
-  #landing[hidden]{display:none}
-  .site-nav{max-width:1100px;width:100%;margin:0 auto;padding:20px 28px;display:flex;align-items:center;justify-content:space-between}
-  .site-logo{font-family:var(--serif);font-size:26px;font-weight:700;letter-spacing:-.5px}
-  .site-logo span{color:var(--maroon)}
-  .site-tag{font-size:13.5px;font-weight:600;color:var(--green);background:#e7f2e9;border:1px solid #b8d8be;padding:5px 12px;border-radius:999px}
+  /* ---------- layout ---------- */
+  .app{flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0}
+  aside{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:18px 18px 28px}
+  aside section{padding:14px 0;border-bottom:1px solid var(--line)}
+  aside section:first-child{padding-top:0}
+  aside section:last-child{border-bottom:0}
+  aside h2{font-size:13.5px;font-weight:650;margin:0 0 8px;color:var(--ink)}
+  .hint{font-size:13px;color:var(--muted);margin:6px 0 0}
 
-  .site-main{max-width:1060px;width:100%;margin:0 auto;padding:16px 28px 56px;display:flex;flex-direction:column;gap:42px}
+  .me{display:flex;align-items:center;gap:8px}
+  .me strong{font-size:16px;font-weight:650;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rename{display:flex;gap:6px;margin-top:8px}
+  .rename[hidden]{display:none}
 
-  /* Hero + Sign-In at Top */
-  .hero-section{display:grid;grid-template-columns:1.15fr 0.85fr;gap:32px;align-items:center;padding-top:10px}
-  .hero-copy h1{font-family:var(--serif);font-size:clamp(34px,4.5vw,50px);line-height:1.1;margin:0 0 14px;letter-spacing:-.8px}
-  .hero-copy h1 span{color:var(--maroon)}
-  .hero-copy .tagline{font-size:18.5px;line-height:1.5;color:var(--ink);margin:0 0 14px;font-weight:500}
-  .hero-copy .desc{font-size:15.5px;line-height:1.6;color:var(--muted);margin:0}
+  .peer{display:flex;align-items:center;gap:9px;padding:5px 0}
+  .peer span.n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .peer small{color:var(--muted);font-size:12.5px}
+  .peer.off span.n{color:var(--muted)}
 
-  .signin-card{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:26px 26px 24px;
-               box-shadow:0 10px 28px rgba(42,29,23,.08);display:flex;flex-direction:column;gap:14px}
-  .signin-card h2{font-family:var(--serif);font-size:22px;margin:0;color:var(--ink)}
-  .signin-card p{font-size:14px;color:var(--muted);margin:-6px 0 2px}
-  .signin-field{display:flex;flex-direction:column;gap:8px}
-  .signin-field label{font-size:13.5px;font-weight:700;color:var(--maroon);text-transform:uppercase;letter-spacing:.6px}
-  .signin-field input{width:100%;font-size:16.5px;padding:12px 14px;border:1.5px solid var(--line);border-radius:8px;background:#fff;font-family:var(--sans)}
-  .signin-field input:focus{outline:2px solid var(--maroon);border-color:var(--maroon)}
-  .signin-submit{width:100%;justify-content:center;padding:13px 18px;font-size:16px;border-radius:8px;background:var(--maroon);border-color:var(--maroon);color:#fff}
-  .signin-submit:hover{filter:brightness(1.1)}
-  .presets{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--muted);padding-top:4px}
-  .preset-chip{font-size:12.5px;padding:4px 10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;cursor:pointer;font-weight:600}
-  .preset-chip:hover{border-color:var(--maroon);color:var(--maroon)}
+  input[type=text]{width:100%;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+  input[type=text]:focus{border-color:var(--navy);outline:none;box-shadow:0 0 0 3px rgba(29,58,110,.15)}
+  .row{display:flex;gap:6px}
+  .addr{font-family:var(--mono);font-size:13px;word-break:break-all}
 
-  /* 3 Feature Cards Section */
-  .features-section{display:flex;flex-direction:column;gap:16px}
-  .features-heading{font-family:var(--serif);font-size:22px;margin:0;color:var(--ink)}
-  .cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  .feature-card{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:24px;
-                box-shadow:0 4px 14px rgba(42,29,23,.05);display:flex;flex-direction:column;gap:10px;transition:transform .15s ease,box-shadow .15s ease}
-  .feature-card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(42,29,23,.09)}
-  .card-badge{width:40px;height:40px;border-radius:10px;background:var(--paper2);border:1px solid var(--line);
-              display:grid;place-items:center;font-size:20px}
-  .feature-card h3{font-family:var(--serif);font-size:20px;margin:2px 0 0;color:var(--ink)}
-  .feature-card .card-kicker{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--maroon)}
-  .feature-card p{font-size:15px;color:var(--muted);line-height:1.55;margin:0}
+  /* ---------- buttons ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 13px;border-radius:6px;cursor:pointer;
+       border:1px solid var(--navy);background:var(--navy);color:#fff;font-weight:600;font-size:14px;white-space:nowrap}
+  .btn:hover{background:#16305c}
+  .btn.sec{background:var(--surface);color:var(--navy);border-color:var(--line)}
+  .btn.sec:hover{border-color:var(--navy)}
+  .btn.link{background:none;border:0;color:var(--navy);padding:2px 4px;font-weight:600}
+  .btn.rec{background:var(--bad);border-color:var(--bad);color:#fff}
 
-  /* ---------- main chat layout ---------- */
-  main{flex:1;display:grid;grid-template-columns:310px 1fr;min-height:0}
-  aside{border-right:1px solid var(--line);background:var(--paper2);overflow-y:auto;padding:18px 20px}
-  aside h2{font-family:var(--serif);font-size:15px;font-weight:700;margin:22px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line);
-           text-transform:uppercase;letter-spacing:1.2px;color:var(--maroon)}
-  aside h2:first-child{margin-top:0}
+  /* ---------- files list ---------- */
+  .filter{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);margin-bottom:6px}
+  .files{max-height:300px;overflow-y:auto}
+  .f{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:8px 2px;border-bottom:1px solid #e6eaef;text-decoration:none;color:inherit}
+  .f:last-child{border-bottom:0}
+  .f:hover .fn{text-decoration:underline}
+  .f .fp{grid-row:span 2;align-self:center}
+  .f .fn{font-weight:600;font-size:14px;word-break:break-all}
+  .f .meta{font-size:12.5px;color:var(--muted)}
+  .f.q{cursor:not-allowed}
+  .f.q:hover .fn{text-decoration:none}
 
-  .member{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:16px}
-  .member.gone{color:var(--muted)} .member.gone .nm{text-decoration:line-through}
-  .member .state{margin-left:auto;font-size:12px;color:var(--muted)}
-  .member.here .state{color:var(--green);font-weight:600}
-  .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;
-      color:#fff;flex:none;font-family:var(--sans)}
+  .status{font-size:12px;font-weight:600}
+  .status.verified{color:var(--ok)} .status.fetching{color:var(--wait)} .status.quarantined,.status.failed{color:var(--bad)}
 
-  /* ---------- shared gossip dropdown & scroll container ---------- */
-  .gossip-dropdown{margin:22px 0 8px;border:1px solid var(--line);border-radius:4px;background:var(--card)}
-  .gossip-dropdown summary{list-style:none;cursor:pointer;padding:9px 12px;font-family:var(--serif);font-size:14.5px;font-weight:700;
-                           text-transform:uppercase;letter-spacing:1.1px;color:var(--maroon);display:flex;align-items:center;justify-content:space-between;
-                           border-bottom:1px solid transparent;user-select:none}
-  .gossip-dropdown summary::-webkit-details-marker{display:none}
-  .gossip-dropdown[open] summary{border-bottom-color:var(--line);background:#f9f1e4}
-  .gossip-dropdown summary .chev{font-size:12px;transition:transform .2s ease;color:var(--muted)}
-  .gossip-dropdown[open] summary .chev{transform:rotate(180deg)}
-  .gossip-count{font-family:var(--sans);font-size:11px;background:var(--maroon);color:#fff;padding:1px 7px;border-radius:999px;margin-left:6px}
-  .gossip-Body{padding:8px 10px 10px}
-  .gossip-filter-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-  .gossip-filter-row select{width:100%;font:inherit;font-size:13.5px;padding:5px 8px;border:1px solid var(--line);border-radius:3px;
-                            background:var(--paper);color:var(--ink);cursor:pointer}
-  .files-scroll{max-height:220px;overflow-y:auto;padding-right:4px}
-  .files-scroll::-webkit-scrollbar{width:6px}
-  .files-scroll::-webkit-scrollbar-track{background:var(--paper2);border-radius:3px}
-  .files-scroll::-webkit-scrollbar-thumb{background:#c5b299;border-radius:3px}
-  .files-scroll::-webkit-scrollbar-thumb:hover{background:var(--maroon)}
+  /* ---------- the fingerprint strip: a CID drawn as 12 colour cells ---------- */
+  .fp{justify-self:start;display:inline-grid;grid-template-columns:repeat(12,6px);height:18px;border-radius:3px;overflow:hidden;border:1px solid rgba(0,0,0,.12);flex:none}
+  .fp i{display:block}
+  .fp.lg{grid-template-columns:repeat(12,14px);height:26px;border-radius:4px}
 
-  .file{display:block;text-decoration:none;color:inherit;padding:8px 2px;border-bottom:1px dashed var(--line)}
-  .file:last-child{border-bottom:0}
-  .file.blocked{cursor:not-allowed;opacity:.85}
-  .file .fn{font-weight:600;word-break:break-all;font-size:14.5px}
-  .file .meta{font-size:11.5px;color:var(--muted);margin-top:2px;font-family:ui-monospace,Consolas,monospace}
-  .chip{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:1px 6px;border-radius:2px;margin-left:4px;font-family:var(--sans)}
-  .chip.ok{color:var(--green);border:1px solid var(--green)}
-  .chip.bad{color:#fff;background:var(--red)}
-  .chip.wait{color:var(--muted);border:1px solid var(--line)}
-  .empty{font-style:italic;color:var(--muted);font-family:var(--serif);font-size:14.5px;padding:6px 0}
+  /* ---------- activity ---------- */
+  .main{display:flex;flex-direction:column;min-height:0}
+  #log{flex:1;overflow-y:auto;padding:20px 28px}
+  .entry{max-width:720px;margin:0 0 12px}
+  .entry .head{font-size:13px;color:var(--muted);margin-bottom:3px}
+  .entry .head b{color:var(--ink);font-weight:650}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+  .entry.mine{margin-left:auto}
+  .entry.mine .head{text-align:right}
+  .entry.mine .card{background:#eef3fb;border-color:#cfdaee}
+  .sys{max-width:720px;margin:4px 0 14px;font-size:13.5px;color:var(--muted);display:flex;gap:10px;align-items:baseline}
+  .sys time{font-size:12px;flex:none;font-variant-numeric:tabular-nums}
 
-  .bridge{display:flex;gap:6px;margin-top:4px}
-  .bridge input{flex:1;min-width:0;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:3px;background:var(--card);font-family:ui-monospace,Consolas,monospace}
-  .hint{font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px}
-  .hint b{color:var(--ink);font-family:ui-monospace,Consolas,monospace;font-weight:600}
+  .filebox{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .filebox .name{font-weight:600;word-break:break-all}
+  .filebox .cid{font-family:var(--mono);font-size:12px;color:var(--muted);word-break:break-all}
+  .filebox .grow{flex:1;min-width:180px}
+  .media{display:block;max-width:100%;max-height:300px;border-radius:6px;margin-bottom:10px;background:var(--bg)}
+  audio.media{width:100%;max-width:380px;height:40px}
 
-  /* ---------- feed ---------- */
-  #feed{flex:1;overflow-y:auto;padding:24px 32px 12px}
-  .msg{display:flex;gap:12px;margin:0 0 16px;max-width:760px;animation:in .25s ease-out}
-  .msg .body{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:10px 14px;min-width:0}
-  .msg .who{font-size:13px;font-weight:700;color:var(--maroon);margin-bottom:3px}
-  .msg .who time{font-weight:400;color:var(--muted);margin-left:6px}
-  .msg .txt{font-size:18px;line-height:1.4}
-  .msg.mine{margin-left:auto;flex-direction:row-reverse}
-  .msg.mine .body{background:#fff3d6;border-color:#ecd39c}
+  .entry.tampered .card{background:var(--bad-bg);border-color:#f0b8b0;border-left:4px solid var(--bad)}
+  .entry.tampered .title{color:var(--bad);font-weight:650;margin-bottom:4px}
+  .compare{display:grid;grid-template-columns:auto auto 1fr;gap:6px 12px;align-items:center;margin-top:10px;font-size:13px}
+  .compare .cid{font-family:var(--mono);font-size:12px;word-break:break-all;color:var(--muted)}
 
-  .note{text-align:center;font-family:var(--serif);font-style:italic;color:var(--muted);margin:10px auto 16px;font-size:16px;max-width:700px}
-
-  .media-preview{margin-top:8px}
-  .media-img{display:block;max-width:100%;max-height:280px;border-radius:3px;border:1px solid var(--line);object-fit:contain;background:var(--paper2)}
-  .media-audio{display:block;width:100%;min-width:250px;max-width:360px;height:38px;margin-top:4px}
-
-  .filecard{margin-top:8px;display:flex;align-items:center;gap:12px;border-top:1px dashed var(--line);padding-top:8px}
-  .filecard .cid{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--muted);word-break:break-all}
-  .dl{margin-left:auto;flex:none;text-decoration:none;font-weight:700;font-size:14px;color:var(--green);border:2px solid var(--green);padding:4px 12px;border-radius:3px}
-  .dl:hover{background:var(--green);color:#fff}
-
-  .fake .body{border:2px solid var(--red);background:#fff5f3;position:relative;padding-right:155px}
-  .fake .txt{color:var(--red);font-weight:600}
-  .stampmini{position:absolute;right:14px;top:50%;transform:translateY(-50%) rotate(-8deg);border:3px solid var(--red);color:var(--red);
-             font-weight:900;letter-spacing:2px;padding:4px 10px;font-size:14px;text-transform:uppercase;font-family:var(--sans)}
-  .cmp{font-family:ui-monospace,Consolas,monospace;font-size:12px;margin-top:8px;line-height:1.6;color:var(--ink)}
-  .cmp span{color:var(--muted)}
-  .orig-link{display:inline-block;margin-top:6px;font-size:13px;font-weight:700;color:var(--green);text-decoration:underline}
+  /* ---------- empty state ---------- */
+  .welcome{max-width:560px;margin:40px auto;color:var(--muted)}
+  .welcome h2{color:var(--ink);font-size:20px;margin:0 0 8px}
+  .welcome ol{padding-left:20px;margin:12px 0 0}
+  .welcome li{margin:6px 0}
 
   /* ---------- composer ---------- */
-  footer{grid-column:2;display:flex;gap:8px;align-items:center;padding:12px 32px 16px;border-top:1px solid var(--line);background:var(--paper);flex-wrap:wrap}
-  footer input[type=text]{flex:1;min-width:180px;font-size:17px;padding:11px 14px;border:1px solid var(--line);border-radius:3px;background:var(--card);font-family:var(--sans)}
-  footer input[type=text]:focus,.bridge input:focus{outline:2px solid var(--marigold);outline-offset:-1px}
-  button,.btn{font:inherit;font-size:14.5px;font-weight:700;cursor:pointer;border-radius:3px;padding:10px 14px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);display:inline-flex;align-items:center;gap:6px}
-  .btn.ghost,button.ghost{background:transparent;color:var(--ink)}
-  button:hover,.btn:hover{filter:brightness(1.12)}
-  button.recording{background:var(--red);border-color:var(--red);color:#fff;animation:pulse 1s infinite}
-  .rec-cancel{font-size:13px;padding:8px 10px;border-color:var(--muted);color:var(--muted)}
-  .rightcol{display:flex;flex-direction:column;min-height:0}
+  .composer{display:flex;gap:8px;align-items:center;padding:12px 28px 14px;background:var(--panel);border-top:1px solid var(--line);flex-wrap:wrap}
+  .composer input[type=text]{flex:1;min-width:200px;padding:10px 12px}
 
-  /* ---------- camera modal ---------- */
-  #camModal{position:fixed;inset:0;background:rgba(42,29,23,.72);z-index:30;display:grid;place-items:center;padding:16px}
-  #camModal[hidden]{display:none}
-  .cam-dialog{background:var(--card);border:2px solid var(--ink);box-shadow:6px 6px 0 var(--ink);border-radius:8px;max-width:520px;width:100%;padding:18px 20px}
-  .cam-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}
-  .cam-head h3{font-family:var(--serif);margin:0;font-size:20px;color:var(--maroon)}
-  #camVideo{width:100%;max-height:340px;background:#1a120e;border:1px solid var(--line);border-radius:4px;display:block;object-fit:cover}
-  .cam-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;flex-wrap:wrap}
+  /* ---------- dialogs & toast ---------- */
+  .modal{position:fixed;inset:0;background:rgba(24,33,43,.55);display:grid;place-items:center;padding:16px;z-index:10}
+  .modal[hidden]{display:none}
+  .dialog{background:var(--surface);border-radius:10px;max-width:520px;width:100%;padding:18px 20px;box-shadow:0 18px 50px rgba(0,0,0,.25)}
+  .dialog h3{margin:0 0 12px;font-size:17px}
+  #camVideo{width:100%;max-height:340px;background:#0f151c;border-radius:6px;display:block;object-fit:cover}
+  .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;flex-wrap:wrap}
 
-  /* ---------- the big rubber stamp ---------- */
-  #stamp{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:25}
-  #stamp div{font-family:var(--sans);font-weight:900;letter-spacing:6px;font-size:min(14vw,130px);padding:10px 34px;
-             border:10px solid currentColor;border-radius:8px;color:var(--maroon);opacity:0;transform:rotate(-12deg) scale(2.2)}
-  #stamp.go div{animation:thump 1.3s ease-out forwards}
-  #stamp.fakey div{color:var(--red)}
-  @keyframes thump{0%{opacity:0;transform:rotate(-12deg) scale(2.2)}18%{opacity:.92;transform:rotate(-12deg) scale(1)}75%{opacity:.92}100%{opacity:0;transform:rotate(-12deg) scale(1)}}
-  @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.72}}
+  #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--bad);color:#fff;padding:10px 16px;border-radius:8px;
+         font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:20;max-width:min(560px,92vw)}
+  #toast[hidden]{display:none}
 
-  @media (max-width:860px){
-    .hero-section{grid-template-columns:1fr}
-    .cards-grid{grid-template-columns:1fr}
-  }
-  @media (max-width:780px){
-    main{grid-template-columns:1fr} aside{display:none} footer{grid-column:1;padding:10px 12px}
-    header{padding:12px 14px} header h1{font-size:22px} #feed{padding:16px 12px}
-    .fake .body{padding-right:14px} .stampmini{position:static;display:inline-block;transform:rotate(-6deg);margin-top:8px}
+  @media (prefers-reduced-motion:no-preference){ #toast{animation:rise .2s ease-out} @keyframes rise{from{opacity:0;transform:translate(-50%,8px)}} }
+  @media (max-width:820px){
+    .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+    aside{border-right:0;border-bottom:1px solid var(--line);max-height:40vh}
+    #log{padding:16px}
+    .composer{padding:10px 12px}
+    .compare{grid-template-columns:auto 1fr}
+    .compare .cid{grid-column:1 / -1;margin-bottom:6px}
   }
 </style>
 </head>
 <body>
 
-<!-- ==================== WEBSITE LANDING PAGE ==================== -->
-<section id="landing" aria-label="Aunty Network Home">
-  <nav class="site-nav">
-    <div class="site-logo">Aunty <span>Network</span></div>
-    <span class="site-tag">Offline Peer-to-Peer over IPFS</span>
-  </nav>
-
-  <div class="site-main">
-    <!-- Top Main Section: Hero + Sign-In Card right at the top -->
-    <div class="hero-section">
-      <div class="hero-copy">
-        <h1>Aunty <span>Network</span></h1>
-        <p class="tagline">
-          Indian aunties have run a zero-infrastructure, peer-to-peer information network for centuries. We built the digital version.
-        </p>
-        <p class="desc">
-          Share notes, live voice updates, and photos directly across laptops and phones when the internet is down. Information spreads node-to-node like gossip, and every file is cryptographically verified before it is forwarded.
-        </p>
-      </div>
-
-      <form class="signin-card" id="enterForm">
-        <h2>Sign in to the Kitty Party</h2>
-        <p>Choose your aunty name to join the local network</p>
-        <div class="signin-field">
-          <label for="landingName">Your Name</label>
-          <input id="landingName" type="text" placeholder="e.g. Sharma Aunty" autocomplete="off" required>
-        </div>
-        <button type="submit" class="signin-submit">Enter Kitty Party →</button>
-        <div class="presets">
-          <span>Quick pick:</span>
-          <button type="button" class="preset-chip" data-name="Sharma Aunty">Sharma Aunty</button>
-          <button type="button" class="preset-chip" data-name="Verma Aunty">Verma Aunty</button>
-          <button type="button" class="preset-chip" data-name="Pammi Buaji">Pammi Buaji</button>
-          <button type="button" class="preset-chip" data-name="Gupta Aunty">Gupta Aunty</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- 3 Characteristics as Feature Cards -->
-    <div class="features-section">
-      <h2 class="features-heading">How It Works</h2>
-      <div class="cards-grid">
-        <div class="feature-card">
-          <div class="card-badge">📡</div>
-          <div class="card-kicker">01 · Local Discovery</div>
-          <h3>Zero Internet Needed</h3>
-          <p>Connect laptops and phones to any offline hotspot. Devices discover each other automatically via local mDNS with no router or cloud servers.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="card-badge">🫖</div>
-          <div class="card-kicker">02 · Gossip Protocol</div>
-          <h3>The Gossip Survives</h3>
-          <p>Messages, photos, and voice notes replicate peer-to-peer via IPFS Pubsub. Even if the sender closes her laptop, the colony keeps the copy.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="card-badge">🛡️</div>
-          <div class="card-kicker">03 · Content Fingerprints</div>
-          <h3>Fake Forwards Caught</h3>
-          <p>Every file gets a cryptographic fingerprint (CID) from its content. Alter a single word in an existing file and the network blocks the fake automatically.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== MAIN APPLICATION ==================== -->
-<header>
-  <h1 id="brandTitle" title="Back to Home">Aunty <span>Network</span></h1>
-  <span class="sub" id="me">connecting to the colony…</span>
-  <button type="button" class="nav-btn" id="openLandingBtn">Home</button>
+<header class="top">
+  <h1 id="appName">Relay</h1>
+  <div class="net"><span class="dot" id="netDot"></span><span id="netText">Connecting to the local node…</span></div>
 </header>
 
-<main>
+<div class="app">
   <aside>
-    <h2>Present today</h2>
-    <div id="members"></div>
+    <section>
+      <h2>This device</h2>
+      <div class="me"><span class="dot on"></span><strong id="meName">…</strong><button class="btn link" id="renameBtn" type="button">Rename</button></div>
+      <form class="rename" id="renameForm" hidden>
+        <input type="text" id="renameInput" maxlength="40" aria-label="Display name">
+        <button class="btn" type="submit">Save</button>
+      </form>
+      <p class="hint">Other people on the network see this name.</p>
+    </section>
 
-    <details class="gossip-dropdown" open>
-      <summary>
-        <span>Shared gossip <span class="gossip-count" id="gossipCount">0</span></span>
-        <span class="chev">▼</span>
-      </summary>
-      <div class="gossip-Body">
-        <div class="gossip-filter-row">
-          <select id="gossipFilter" aria-label="Filter shared gossip">
-            <option value="all">All shared gossip</option>
-            <option value="verified">Verified only</option>
-            <option value="media">Photos &amp; Voice notes</option>
-            <option value="docs">Documents &amp; Notes</option>
-            <option value="fake">Blocked fakes</option>
-          </select>
-        </div>
-        <div id="files" class="files-scroll">
-          <div class="empty">Nothing yet. Suspiciously quiet.</div>
-        </div>
-      </div>
-    </details>
+    <section>
+      <h2>Peers</h2>
+      <div id="peers"></div>
+    </section>
 
-    <h2>Invite an aunty</h2>
-    <form class="bridge" id="bridgeForm">
-      <input id="bridgeIp" placeholder="her laptop's IP, e.g. 192.168.43.12" autocomplete="off">
-      <button class="ghost" type="submit">Invite</button>
-    </form>
-    <div class="hint" id="bridgeMsg">Only needed if she doesn't show up above on her own.</div>
+    <section>
+      <h2>Shared files <span id="fileCount" class="hint"></span></h2>
+      <select id="filter" class="filter" aria-label="Filter files">
+        <option value="all">All files</option>
+        <option value="verified">Verified</option>
+        <option value="media">Photos and voice notes</option>
+        <option value="docs">Documents</option>
+        <option value="quarantined">Quarantined</option>
+      </select>
+      <div id="files" class="files"></div>
+    </section>
 
-    <h2>Phones join at</h2>
-    <div class="hint" id="ips"></div>
+    <section>
+      <h2>Connect to a peer</h2>
+      <form class="row" id="connectForm">
+        <input type="text" id="connectIp" placeholder="192.168.43.12" autocomplete="off" aria-label="Peer IP address">
+        <button class="btn sec" type="submit">Connect</button>
+      </form>
+      <p class="hint" id="connectMsg">Peers on the same network usually appear on their own. Use this if one doesn't.</p>
+    </section>
+
+    <section>
+      <h2>Open on other devices</h2>
+      <div id="ips" class="addr"></div>
+      <p class="hint">Phones and laptops on this network can use the app through this address.</p>
+    </section>
   </aside>
 
-  <div class="rightcol">
-    <div id="feed"></div>
-    <footer>
-      <input type="text" id="msg" placeholder="Type some gossip…" autocomplete="off">
-      <button type="button" id="send">Send</button>
-
-      <!-- Direct Real-Time Microphone & Camera Capture (never opens file folders) -->
-      <button type="button" class="ghost" id="voiceBtn" title="Record live voice audio from microphone">🎙️ Voice</button>
-      <button type="button" class="ghost rec-cancel" id="voiceCancelBtn" hidden title="Cancel voice recording">Cancel</button>
-
-      <button type="button" class="ghost" id="camBtn" title="Capture live photo from camera">📷 Camera</button>
-
-      <label class="btn ghost" title="Share a file from your device">📎 Share a file<input type="file" id="file" hidden></label>
-    </footer>
+  <div class="main">
+    <div id="log"></div>
+    <form class="composer" id="composer">
+      <input type="text" id="msg" placeholder="Write a message" autocomplete="off" aria-label="Message">
+      <button class="btn" type="submit">Send</button>
+      <button class="btn sec" type="button" id="voiceBtn">Record voice</button>
+      <button class="btn sec" type="button" id="voiceCancel" hidden>Cancel</button>
+      <button class="btn sec" type="button" id="camBtn">Take photo</button>
+      <label class="btn sec">Share file<input type="file" id="file" hidden></label>
+    </form>
   </div>
-</main>
+</div>
 
-<!-- ==================== LIVE CAMERA CAPTURE MODAL ==================== -->
-<div id="camModal" role="dialog" aria-modal="true" aria-labelledby="camTitle" hidden>
-  <div class="cam-dialog">
-    <div class="cam-head">
-      <h3 id="camTitle">Live Camera Capture</h3>
-      <button type="button" class="ghost" id="camCloseBtn" style="padding:4px 10px">✕</button>
-    </div>
+<div class="modal" id="camModal" role="dialog" aria-modal="true" aria-labelledby="camTitle" hidden>
+  <div class="dialog">
+    <h3 id="camTitle">Take photo</h3>
     <video id="camVideo" autoplay playsinline muted></video>
     <canvas id="camCanvas" hidden></canvas>
-    <div class="cam-actions">
-      <button type="button" class="ghost" id="camFlipBtn">Switch Camera</button>
-      <button type="button" id="camSnapBtn">📷 Snap &amp; Share to Chat</button>
+    <div class="actions">
+      <button class="btn sec" type="button" id="camClose">Cancel</button>
+      <button class="btn sec" type="button" id="camFlip">Switch camera</button>
+      <button class="btn" type="button" id="camSnap">Share photo</button>
     </div>
   </div>
 </div>
 
-<div id="stamp"><div>HAWWW!</div></div>
+<div id="toast" role="alert" hidden></div>
 
 <script>
 const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const time = (t) => new Date(t).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
-const shortCid = (c) => c ? c.slice(0,8) + "…" + c.slice(-6) : "";
-const COLORS = ["#8a1c2b","#2f6b3a","#b8652a","#3c4f8a","#7a4a8c","#1f6f6b","#9a7b1c"];
-const colorOf = (n) => COLORS[[...String(n)].reduce((s,c)=>s+c.charCodeAt(0),0) % COLORS.length];
-const initials = (n) => String(n).split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
-const av = (n) => `<span class="av" style="background:${colorOf(n)}">${esc(initials(n))}</span>`;
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const time = (t) => new Date(t).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+const isImage = (fn) => /\.(jpe?g|png|gif|webp|svg)$/i.test(String(fn || ""));
+const isAudio = (fn) => /\.(webm|ogg|mp3|wav|m4a)$/i.test(String(fn || ""));
+let state = null;
 
-const isImageFile = (fn) => /\.(jpe?g|png|gif|webp|svg)$/i.test(String(fn || ""));
-const isAudioFile = (fn) => /\.(webm|ogg|mp3|wav|m4a)$/i.test(String(fn || ""));
-
-let me = "";
-let lastState = null;
-
-// ---------- landing page ----------
-if (sessionStorage.getItem("enteredColony") === "1") {
-  $("landing").hidden = true;
-}
-document.querySelectorAll(".preset-chip").forEach((btn) => {
-  btn.onclick = () => { $("landingName").value = btn.dataset.name; };
-});
-$("openLandingBtn").onclick = () => {
-  if (me) $("landingName").value = me;
-  $("landing").hidden = false;
-};
-$("brandTitle").onclick = () => {
-  if (me) $("landingName").value = me;
-  $("landing").hidden = false;
-};
-$("enterForm").onsubmit = async (e) => {
-  e.preventDefault();
-  const chosen = $("landingName").value.trim();
-  if (chosen && chosen !== me) {
-    try {
-      await fetch("/set-name", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: chosen }),
-      });
-    } catch (_) {}
+// ---------- fingerprint strip ----------
+// Turns the last 24 characters of a CID into 12 colour cells, so two
+// fingerprints can be compared at a glance. Different content = different strip.
+function fingerprint(cid, large){
+  const s = String(cid || "").slice(-24);
+  let cells = "";
+  for (let i = 0; i < 12; i++) {
+    const a = s.charCodeAt(i*2) || 0, b = s.charCodeAt(i*2+1) || 0;
+    const hue = (a * 37 + b * 11) % 360;
+    const light = 38 + ((a + b) % 4) * 10;
+    cells += `<i style="background:hsl(${hue} 55% ${light}%)"></i>`;
   }
-  sessionStorage.setItem("enteredColony", "1");
-  $("landing").hidden = true;
-};
-
-// ---------- sound + rubber stamp ----------
-let ctx;
-document.addEventListener("click", () => { ctx = ctx || new (window.AudioContext||window.webkitAudioContext)(); }, {once:true});
-function thump(fake){
-  try{
-    ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
-    const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime;
-    o.type = fake ? "square" : "triangle";
-    o.frequency.setValueAtTime(fake ? 220 : 160, t);
-    o.frequency.exponentialRampToValueAtTime(fake ? 90 : 60, t + .25);
-    g.gain.setValueAtTime(.35, t); g.gain.exponentialRampToValueAtTime(.001, t + .3);
-    o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + .3);
-  }catch(e){}
-  const s = $("stamp"); s.firstElementChild.textContent = fake ? "FAKE!" : "HAWWW!";
-  s.className = ""; void s.offsetWidth; s.className = "go" + (fake ? " fakey" : "");
+  return `<span class="fp${large ? " lg" : ""}" title="${esc(cid)}" aria-hidden="true">${cells}</span>`;
 }
 
-// ---------- feed ----------
-function render(b){
-  const feed = $("feed");
-  let el;
-  if (b.kind === "system") {
-    el = document.createElement("div"); el.className = "note"; el.textContent = b.text;
-  } else {
-    const mine = b.kind === "mine" || b.mine;
-    const from = b.from || me;
-    el = document.createElement("div");
-    el.className = "msg" + (mine ? " mine" : "") + (b.kind === "fake" ? " fake" : "");
-    let html = `<div class="who">${esc(mine ? "You" : from)}<time>${time(b.time)}</time></div><div class="txt">${esc(b.text)}</div>`;
-    if (b.cid && b.kind !== "fake") {
-      if (isImageFile(b.file)) {
-        html += `<div class="media-preview"><img class="media-img" src="/file/${encodeURIComponent(b.cid)}?inline=1" alt="${esc(b.file)}" loading="lazy"></div>`;
-      } else if (isAudioFile(b.file)) {
-        html += `<div class="media-preview"><audio class="media-audio" controls preload="metadata" src="/file/${encodeURIComponent(b.cid)}?inline=1"></audio></div>`;
-      }
-      html += `<div class="filecard"><div><b>${esc(b.file)}</b><div class="cid">fingerprint ${esc(shortCid(b.cid))}</div></div>
-               <a class="dl" href="/file/${encodeURIComponent(b.cid)}">Download</a></div>`;
-    }
-    if (b.kind === "fake") {
-      html += `<div class="cmp"><span>original fingerprint </span>${esc(shortCid(b.original))}<br><span>this forward&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>${esc(shortCid(b.cid))} (quarantined)</div>
-               ${b.original ? `<a class="orig-link" href="/file/${encodeURIComponent(b.original)}">Download verified original (${esc(b.file)})</a>` : ""}
-               <div class="stampmini">Fake forward</div>`;
-    }
-    el.innerHTML = av(from) + `<div class="body">${html}</div>`;
+// ---------- activity log ----------
+function welcome(){
+  return `<div class="welcome" id="welcome">
+    <h2>No activity yet</h2>
+    <p>Everything shared here moves directly between devices on this network. Nothing goes through the internet.</p>
+    <ol>
+      <li>Connect each device to the same Wi-Fi or hotspot. It doesn't need internet access.</li>
+      <li>Start the node on each device. Peers appear in the sidebar within a few seconds.</li>
+      <li>Send a message or share a file. Each file is checked against its content fingerprint before anyone downloads it.</li>
+    </ol>
+  </div>`;
+}
+
+function render(e){
+  const log = $("log");
+  $("welcome")?.remove();
+  const el = document.createElement("div");
+  const mine = !!e.mine;
+  const from = mine ? "You" : e.from;
+
+  if (e.kind === "system") {
+    el.className = "sys";
+    el.innerHTML = `<time>${time(e.time)}</time><span>${esc(e.text)}</span>`;
+  } else if (e.kind === "message") {
+    el.className = "entry" + (mine ? " mine" : "");
+    el.innerHTML = `<div class="head"><b>${esc(from)}</b> ${time(e.time)}</div><div class="card">${esc(e.text)}</div>`;
+  } else if (e.kind === "file") {
+    const src = `/file/${encodeURIComponent(e.cid)}`;
+    let media = "";
+    if (isImage(e.file)) media = `<img class="media" src="${src}?inline=1" alt="${esc(e.file)}" loading="lazy">`;
+    else if (isAudio(e.file)) media = `<audio class="media" controls preload="metadata" src="${src}?inline=1"></audio>`;
+    el.className = "entry" + (mine ? " mine" : "");
+    el.innerHTML = `<div class="head"><b>${esc(from)}</b> shared a file at ${time(e.time)}</div>
+      <div class="card">${media}<div class="filebox">${fingerprint(e.cid, true)}
+        <div class="grow"><div class="name">${esc(e.file)}</div><div class="cid">${esc(e.cid)}</div></div>
+        <a class="btn sec" href="${src}">Download</a></div></div>`;
+  } else if (e.kind === "tampered") {
+    el.className = "entry tampered" + (mine ? " mine" : "");
+    el.innerHTML = `<div class="head"><b>${esc(from)}</b> ${time(e.time)}</div>
+      <div class="card"><div class="title">Integrity check failed: ${esc(e.file)}</div>
+        <div>${esc(e.text)}</div>
+        <div class="compare">
+          <span>Original</span>${fingerprint(e.original, true)}<span class="cid">${esc(e.original)}</span>
+          <span>Received</span>${fingerprint(e.cid, true)}<span class="cid">${esc(e.cid)}</span>
+        </div>
+        <div class="actions" style="justify-content:flex-start"><a class="btn sec" href="/file/${encodeURIComponent(e.original)}">Download the original</a></div>
+      </div>`;
   }
-  feed.appendChild(el);
-  feed.scrollTop = feed.scrollHeight;
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
 }
 
 // ---------- sidebar ----------
-function renderFilesList(files) {
-  const filter = $("gossipFilter").value;
-  $("gossipCount").textContent = files.length;
-
-  const filtered = files.filter((f) => {
-    if (filter === "verified") return !f.fake && f.status !== "fetching";
-    if (filter === "media") return !f.fake && (isImageFile(f.filename) || isAudioFile(f.filename));
-    if (filter === "docs") return !f.fake && !isImageFile(f.filename) && !isAudioFile(f.filename);
-    if (filter === "fake") return !!f.fake;
+function renderFiles(){
+  const all = state?.files || [];
+  const filter = $("filter").value;
+  const list = all.filter(f => {
+    if (filter === "verified") return f.status === "verified";
+    if (filter === "media") return !f.tampered && (isImage(f.filename) || isAudio(f.filename));
+    if (filter === "docs") return !f.tampered && !isImage(f.filename) && !isAudio(f.filename);
+    if (filter === "quarantined") return f.tampered;
     return true;
   });
-
-  $("files").innerHTML = filtered.length ? filtered.map(f => {
-    const chip = f.fake ? `<span class="chip bad">fake · blocked</span>`
-               : (f.status === "fetching" ? `<span class="chip wait">fetching</span>` : `<span class="chip ok">verified</span>`);
-    const icon = isImageFile(f.filename) ? "📷 " : (isAudioFile(f.filename) ? "🎙️ " : "");
-    if (f.fake) {
-      return `<div class="file blocked" title="Quarantined: fingerprint does not match original"><div class="fn">${icon}${esc(f.filename)}${chip}</div>
-              <div class="meta">${esc(f.from)} · ${esc(shortCid(f.cid))}</div></div>`;
-    }
-    return `<a class="file" href="/file/${encodeURIComponent(f.cid)}"><div class="fn">${icon}${esc(f.filename)}${chip}</div>
-            <div class="meta">${esc(f.from)} · ${esc(shortCid(f.cid))}</div></a>`;
-  }).join("") : `<div class="empty">Nothing in this category yet.</div>`;
+  $("fileCount").textContent = all.length ? `(${all.length})` : "";
+  $("files").innerHTML = list.length ? list.map(f => {
+    const label = { verified:"Verified", fetching:"Fetching…", quarantined:"Quarantined", failed:"Failed" }[f.status] || f.status;
+    const inner = `${fingerprint(f.cid)}<span class="fn">${esc(f.filename)}</span>
+      <span class="meta">${esc(f.from)}, <span class="status ${esc(f.status)}">${label}</span></span>`;
+    return f.tampered || f.status !== "verified"
+      ? `<div class="f q" title="Not available: ${label.toLowerCase()}">${inner}</div>`
+      : `<a class="f" href="/file/${encodeURIComponent(f.cid)}">${inner}</a>`;
+  }).join("") : `<p class="hint">${all.length ? "No files match this filter." : "Files you or your peers share will be listed here."}</p>`;
 }
 
-$("gossipFilter").onchange = () => {
-  if (lastState) renderFilesList(lastState.files || []);
-};
-
 function renderState(s){
-  lastState = s;
-  me = s.me;
-  if (!$("landingName").value) $("landingName").value = s.me;
-  $("me").textContent = `you are ${s.me} — kitty party register`;
-  $("members").innerHTML =
-    `<div class="member here">${av(s.me)}<span class="nm">${esc(s.me)} (you)</span><span class="state">here</span></div>` +
-    (s.aunties.length ? "" : `<div class="hint">Waiting for other aunties to arrive…</div>`) +
-    s.aunties.map(a=>`<div class="member ${a.online?"here":"gone"}">${av(a.name)}<span class="nm">${esc(a.name)}</span>
-      <span class="state">${a.online?"here":"left"}</span></div>`).join("");
-
-  renderFilesList(s.files || []);
-
-  $("ips").innerHTML = s.ips.length ? s.ips.map(ip=>`<b>http://${ip}:${s.port}</b>`).join("<br>") : "No network found.";
+  state = s;
+  document.title = s.app;
+  $("appName").textContent = s.app;
+  $("meName").textContent = s.me;
+  const online = s.peers.filter(p => p.online).length;
+  $("netDot").className = "dot" + (online ? " on" : "");
+  $("netText").textContent = online ? `${online} peer${online === 1 ? "" : "s"} online` : "Waiting for peers";
+  $("peers").innerHTML = s.peers.length
+    ? s.peers.map(p => `<div class="peer${p.online ? "" : " off"}"><span class="dot${p.online ? " on" : ""}"></span>
+        <span class="n">${esc(p.name)}</span><small>${p.online ? "Online" : "Offline"}</small></div>`).join("")
+    : `<p class="hint" style="margin:0">No peers yet. Start the node on another device on this network.</p>`;
+  $("ips").innerHTML = s.ips.length ? s.ips.map(ip => `http://${ip}:${s.port}`).join("<br>") : "Not connected to a network.";
+  renderFiles();
 }
 
 // ---------- live updates ----------
 const es = new EventSource("/events");
-es.addEventListener("init", (e) => { const d = JSON.parse(e.data); $("feed").innerHTML = ""; d.feed.forEach(render); renderState(d); });
-es.addEventListener("state", (e) => renderState(JSON.parse(e.data)));
-es.addEventListener("bubble", (e) => {
-  const b = JSON.parse(e.data); render(b);
-  if (b.kind === "file") thump(false);
-  if (b.kind === "fake") thump(true);
+es.addEventListener("init", (ev) => {
+  const d = JSON.parse(ev.data);
+  $("log").innerHTML = d.feed.length ? "" : welcome();
+  d.feed.forEach(render);
+  renderState(d);
 });
-es.onerror = () => { $("me").textContent = "lost the aunty server — reconnecting…"; };
+es.addEventListener("state", (ev) => renderState(JSON.parse(ev.data)));
+es.addEventListener("entry", (ev) => {
+  const e = JSON.parse(ev.data);
+  render(e);
+  if (e.kind === "tampered" && !e.mine) toast(`Rejected a modified copy of ${e.file} from ${e.from}.`);
+});
+es.onerror = () => { $("netDot").className = "dot"; $("netText").textContent = "Lost connection to the local node. Retrying…"; };
 
-// ---------- file upload helper ----------
-async function uploadBlob(blob, filename) {
-  const r = await fetch(`/upload?name=${encodeURIComponent(filename)}`, { method: "POST", body: blob });
-  if (!r.ok) alert("Upload failed: " + (await r.text()));
+let toastTimer;
+function toast(text){
+  const t = $("toast"); t.textContent = text; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 6000);
 }
 
-// ---------- chat & standard file share ----------
-async function sendChat(){
+// ---------- rename ----------
+$("renameBtn").onclick = () => {
+  $("renameForm").hidden = !$("renameForm").hidden;
+  $("renameInput").value = state?.me || "";
+  if (!$("renameForm").hidden) $("renameInput").focus();
+};
+$("renameForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const name = $("renameInput").value.trim(); if (!name) return;
+  await fetch("/name", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({name})});
+  $("renameForm").hidden = true;
+};
+
+// ---------- messages & files ----------
+$("composer").onsubmit = async (e) => {
+  e.preventDefault();
   const text = $("msg").value.trim(); if (!text) return;
   $("msg").value = "";
-  await fetch("/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({text})});
+  await fetch("/message", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({text})});
+};
+async function upload(blob, name){
+  const r = await fetch(`/upload?name=${encodeURIComponent(name)}`, {method:"POST", body: blob});
+  if (!r.ok) toast("Upload failed: " + ((await r.json().catch(() => ({}))).error || r.status));
 }
-$("send").onclick = sendChat;
-$("msg").addEventListener("keydown", (e) => { if (e.key === "Enter") sendChat(); });
-
 $("file").onchange = async () => {
   const f = $("file").files[0]; if (!f) return;
-  await uploadBlob(f, f.name);
+  await upload(f, f.name);
   $("file").value = "";
 };
+$("filter").onchange = renderFiles;
 
-// ---------- Direct Real-Time Microphone Capture (Never opens file explorer) ----------
-let mediaRecorder = null;
-let audioChunks = [];
-let recTimer = null;
-let recSeconds = 0;
-let recCanceled = false;
-
-function stopVoiceStream(stream) {
-  if (stream) stream.getTracks().forEach((t) => t.stop());
-}
-
-function resetVoiceUI() {
+// ---------- voice notes ----------
+let rec = null, chunks = [], recTimer = null, recSecs = 0, recCancelled = false;
+function resetVoice(){
   clearInterval(recTimer);
-  $("voiceBtn").classList.remove("recording");
-  $("voiceBtn").textContent = "🎙️ Voice";
-  $("voiceCancelBtn").hidden = true;
+  $("voiceBtn").classList.remove("rec");
+  $("voiceBtn").textContent = "Record voice";
+  $("voiceCancel").hidden = true;
 }
-
 $("voiceBtn").onclick = async () => {
-  // If currently recording -> stop & send live recording to chat!
-  if (mediaRecorder && mediaRecorder.state === "recording") {
-    recCanceled = false;
-    mediaRecorder.stop();
-    return;
-  }
-
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    alert("Microphone access requires opening http://localhost:3000 (or HTTPS) in your browser.");
-    return;
-  }
-
+  if (rec && rec.state === "recording") { recCancelled = false; rec.stop(); return; }
+  if (!navigator.mediaDevices?.getUserMedia) { toast("Microphone access needs http://localhost:3000 or HTTPS."); return; }
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    audioChunks = [];
-    recCanceled = false;
-    const mimeType = typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "";
-    mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
-
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data && e.data.size > 0) audioChunks.push(e.data);
-    };
-    mediaRecorder.onstop = async () => {
-      stopVoiceStream(stream);
-      resetVoiceUI();
-      if (recCanceled || !audioChunks.length) return;
-      const ext = (mediaRecorder.mimeType || "").includes("mp4") ? "m4a" : "webm";
+    chunks = []; recCancelled = false;
+    const type = window.MediaRecorder && MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "";
+    rec = type ? new MediaRecorder(stream, { mimeType: type }) : new MediaRecorder(stream);
+    rec.ondataavailable = (e) => { if (e.data?.size) chunks.push(e.data); };
+    rec.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      resetVoice();
+      if (recCancelled || !chunks.length) return;
+      const ext = (rec.mimeType || "").includes("mp4") ? "m4a" : "webm";
       const stamp = new Date().toTimeString().slice(0, 8).replace(/:/g, "-");
-      const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
-      await uploadBlob(blob, `Voice_Note_${stamp}.${ext}`);
+      await upload(new Blob(chunks, { type: rec.mimeType || "audio/webm" }), `voice-note-${stamp}.${ext}`);
     };
-
-    mediaRecorder.start();
-    recSeconds = 0;
-    $("voiceBtn").classList.add("recording");
-    $("voiceBtn").textContent = "● 0:00 · Send Voice";
-    $("voiceCancelBtn").hidden = false;
+    rec.start();
+    recSecs = 0;
+    $("voiceBtn").classList.add("rec");
+    $("voiceBtn").textContent = "Stop and send (0:00)";
+    $("voiceCancel").hidden = false;
     recTimer = setInterval(() => {
-      recSeconds++;
-      const m = Math.floor(recSeconds / 60);
-      const s = String(recSeconds % 60).padStart(2, "0");
-      $("voiceBtn").textContent = `● ${m}:${s} · Send Voice`;
+      recSecs++;
+      $("voiceBtn").textContent = `Stop and send (${Math.floor(recSecs / 60)}:${String(recSecs % 60).padStart(2, "0")})`;
     }, 1000);
-  } catch (err) {
-    alert("Could not access microphone (" + err.message + "). Please allow microphone permission in your browser address bar.");
-  }
+  } catch (err) { toast("Couldn't use the microphone: " + err.message); }
 };
+$("voiceCancel").onclick = () => { if (rec?.state === "recording") { recCancelled = true; rec.stop(); } };
 
-$("voiceCancelBtn").onclick = () => {
-  if (mediaRecorder && mediaRecorder.state === "recording") {
-    recCanceled = true;
-    mediaRecorder.stop();
-  }
-};
-
-// ---------- Direct Real-Time Camera Capture (Never opens file explorer) ----------
-let camStream = null;
-let useRearCamera = false;
-
-async function openCamera() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    alert("Camera access requires opening http://localhost:3000 (or HTTPS) in your browser.");
-    return;
-  }
-  if (camStream) camStream.getTracks().forEach((t) => t.stop());
+// ---------- camera ----------
+let cam = null, rear = false;
+async function openCamera(){
+  if (!navigator.mediaDevices?.getUserMedia) { toast("Camera access needs http://localhost:3000 or HTTPS."); return; }
+  cam?.getTracks().forEach(t => t.stop());
   try {
-    const constraints = useRearCamera
-      ? { video: { facingMode: { ideal: "environment" } }, audio: false }
-      : { video: true, audio: false };
-    camStream = await navigator.mediaDevices.getUserMedia(constraints);
-    const video = $("camVideo");
-    video.srcObject = camStream;
+    cam = await navigator.mediaDevices.getUserMedia({ video: rear ? { facingMode: { ideal: "environment" } } : true, audio: false });
+    $("camVideo").srcObject = cam;
     $("camModal").hidden = false;
-    await video.play().catch(() => {});
-  } catch (err) {
-    alert("Could not access camera (" + err.message + "). Please allow camera permission in your browser address bar.");
-  }
+    await $("camVideo").play().catch(() => {});
+  } catch (err) { toast("Couldn't use the camera: " + err.message); }
 }
-
-function closeCamera() {
-  if (camStream) {
-    camStream.getTracks().forEach((t) => t.stop());
-    camStream = null;
-  }
-  $("camVideo").srcObject = null;
-  $("camModal").hidden = true;
+function closeCamera(){
+  cam?.getTracks().forEach(t => t.stop()); cam = null;
+  $("camVideo").srcObject = null; $("camModal").hidden = true;
 }
-
-$("camBtn").onclick = () => openCamera();
-$("camCloseBtn").onclick = closeCamera;
-$("camFlipBtn").onclick = () => {
-  useRearCamera = !useRearCamera;
-  openCamera();
-};
-$("camSnapBtn").onclick = () => {
-  const video = $("camVideo");
-  const canvas = $("camCanvas");
-  const w = video.videoWidth || 640;
-  const h = video.videoHeight || 480;
-  canvas.width = w;
-  canvas.height = h;
-  canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-  canvas.toBlob(async (blob) => {
+$("camBtn").onclick = openCamera;
+$("camClose").onclick = closeCamera;
+$("camFlip").onclick = () => { rear = !rear; openCamera(); };
+$("camSnap").onclick = () => {
+  const v = $("camVideo"), c = $("camCanvas");
+  c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
+  c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+  c.toBlob(async (blob) => {
     closeCamera();
     if (!blob) return;
     const stamp = new Date().toTimeString().slice(0, 8).replace(/:/g, "-");
-    await uploadBlob(blob, `Photo_${stamp}.jpg`);
+    await upload(blob, `photo-${stamp}.jpg`);
   }, "image/jpeg", 0.9);
 };
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && !$("camModal").hidden) closeCamera();
-});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("camModal").hidden) closeCamera(); });
 
-// ---------- invite bridge ----------
-$("bridgeForm").onsubmit = async (e) => {
+// ---------- connect to a peer ----------
+$("connectForm").onsubmit = async (e) => {
   e.preventDefault();
-  const ip = $("bridgeIp").value.trim(); if (!ip) return;
-  $("bridgeMsg").textContent = "Calling her…";
-  const r = await fetch("/bridge", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ip})});
-  const d = await r.json().catch(()=>({}));
-  $("bridgeMsg").textContent = r.ok ? `Connected to ${d.name}. She'll appear above in a few seconds.` : (d.error || "Couldn't connect.");
+  const ip = $("connectIp").value.trim(); if (!ip) return;
+  $("connectMsg").textContent = `Connecting to ${ip}…`;
+  const r = await fetch("/connect", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ip})});
+  const d = await r.json().catch(() => ({}));
+  $("connectMsg").textContent = r.ok ? `Connected to ${d.name}.` : (d.error || "Couldn't connect.");
 };
 </script>
 </body>
 </html>
-
-

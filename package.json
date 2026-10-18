@@ -1,7 +1,7 @@
 {
-  "name": "aunty-network",
-  "version": "1.0.0",
-  "description": "Offline peer-to-peer gossip network over IPFS. Verified before forwarded.",
+  "name": "relay",
+  "version": "2.0.0",
+  "description": "Offline peer-to-peer file and message sharing over IPFS, with content-fingerprint integrity checks.",
   "main": "server.js",
   "scripts": { "start": "node server.js" },
   "engines": { "node": ">=18" },

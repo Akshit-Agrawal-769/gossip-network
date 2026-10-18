@@ -1,7 +1,7 @@
+ipfs
 ipfs.exe
 kubo/
-kubo.zip
+kubo*.zip
 node_modules/
+data/
 state-*.json
-kubo_v*.zip
-t.txt
